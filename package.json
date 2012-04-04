@@ -1,0 +1,11 @@
+{
+    "name": "WeathermapsViewer"
+  , "description": "Application to archive and study weathermaps. It is *not* intended to produce them !"  
+  , "version": "0.0.1"
+  , "private": true
+  , "dependencies": {
+      "coffee-script": "1.2.x"
+    , "restify": ">=1.3.0"
+    , "mongoose": ">=2.1.0"
+  }
+}
