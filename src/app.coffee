@@ -25,8 +25,10 @@ Restify = require 'restify'
 Connect = require 'connect'
 Logger = require 'bunyan'
 Path = require 'path'
+Fs = require 'fs'
 
-require './lib/response'
+require './lib/parsedir'
+require './lib/utils'
 
 # Configuration
 staticFilesDir = Path.join __dirname,"../static/"
@@ -59,6 +61,8 @@ Server.use Restify.urlEncodedBodyParser()
 
 ###
 TODO:
+  * return bad method for paths under the API dir
+  * faille se sécu => filtrer les ".." dans les urls
   * return main file
   * return main file on right start page ?
   * config file
@@ -85,41 +89,61 @@ API:
   * GET /wm-api/:groupname/maps => get a list of available maps for this group
   * GET /wm-api/:groupname/:mapname/dates => get list of archived days
   * GET /wm-api/:groupname/:mapname/:date/times
-  * GET /wm-maps/*.png => get a given picture
+  * GET /wm-api/*.png => get a given map
   * GET /wm/ => static app files
 ###
 
 Server.get '/wm-api/groups', (req, res, next) ->
-  res.respond 200, 'Found', data
-  next()
+  Fs.parsedir weathermapsDir, (err, files) =>
+    if not files.directories
+      res.send new Restify.ResourceNotFoundError("No groups were found")
+    else
+      res.send 200, files.directories
+    next()
+
 
 Server.get '/wm-api/:groupname/maps', (req, res, next) ->
-  res.respond 200, 'Found', data
-  next()
+  Fs.parsedir weathermapsDir+req.params.groupname, (err, files) =>
+    if not files.directories
+      res.send new Restify.ResourceNotFoundError("No maps were found for group "+req.params.groupname)
+    else
+      res.send 200, files.directories
+    next()
 
 Server.get '/wm-api/:groupname/:mapname/dates', (req, res, next) ->
-  res.respond 200, 'Found', data
-  next()
+  Fs.parsedir weathermapsDir+req.params.groupname+"/"+req.params.mapname, (err, files) =>
+    if not files.directories
+      res.send new Restify.ResourceNotFoundError("No dates were found for group "+req.params.groupname)
+    else
+      res.send 200, files.directories
+    next()
 
-Server.get '/wm-api/:groupname/:mapname/:dates/:times', (req, res, next) ->
-  res.respond 200, 'Found', data
-  next()
+Server.get '/wm-api/:groupname/:mapname/:dates/times', (req, res, next) ->
+  Fs.parsedir weathermapsDir+req.params.groupname+"/"+req.params.mapname+"/"+req.params.dates, (err, files) =>
+    if files.files
+      ret = []
+      files.files.forEach (file) =>
+        return if not file.endsWith ".png"
+        ret.push file.slice(0, -4)
+      if ret.length
+        res.send 200, ret
+        return next() 
+    res.send new Restify.ResourceNotFoundError("No times were found for group "+req.params.groupname+" at date "+req.params.dates)
+    next()
 
 # Application static files
 createStaticServer "application file", staticFilesDir, "wm"
 
 # Weathermaps files
-createStaticServer "map", weathermapsDir, "wm-maps", "png"
+createStaticServer "map", weathermapsDir, "wm-api", "png"
 
 #Server.on 'after', -> (req, res, name)
 #  req.log.info '%s just finished: %d.', name, res.code
 
 #Server.on 'NotFound', (req, res) ->
 #  console.log res
-#  res.respond 404, req.url + ' was not found'
+#  res.send 404, req.url + ' was not found'
 
 Server.listen 3008, () ->
   log.info 'listening: %s', Server.url
-
-
 

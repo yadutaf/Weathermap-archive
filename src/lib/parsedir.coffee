@@ -21,35 +21,25 @@
 # USE OR OTHER DEALINGS IN THE SOFTWARE.
 ###
 
-# This file adds a method on 'http' module to improve answers standardisation
+# This file adds a method on 'fs' module to improve directory read
 
-http = require 'http'
-assert = require 'assert'
+fs = require 'fs'
 
-http.ServerResponse.prototype.respond = (code, message, data) ->
-  message = message || ""
-
-  if 'undefined' == typeof data && 'object' == typeof message
-    data = message
-    message = ""
-
-  answer = {
-    code: code,
-    message: message,
-    data: data
-  }
-
-  body = JSON.stringify answer
-
-  assert.equal this._headersent, undefined
-  this.writeHead code, message, {
-    'Content-Length': body.length,
-    'Content-Type': 'application/json'
-  }
-
-  this.end body
+fs.parsedir = (path, cb) ->
+  dir = {}
+  this.readdir path, (err, list) =>
+    return cb(err) if err
+    pending = list.length
+    return cb(null, dir) if not pending
+    list.forEach (file) =>
+      fs.stat path+'/'+file, (err, stat) =>
+        if stat
+          if stat.isDirectory()
+           dir.directories = [] if not dir.directories
+           dir.directories.push file
+          else if stat.isFile()
+           dir.files = [] if not dir.files
+           dir.files.push file
+        cb(null, dir) if not --pending
 
 
-http.ServerResponse.prototype.respondId = (code, message, id) ->
-  message = message || ""
-  this.respond code, message, {'_id': id}
