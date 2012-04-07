@@ -59,6 +59,17 @@ Server.use Restify.authorizationParser()
 Server.use Restify.dateParser()
 Server.use Restify.queryParser()
 Server.use Restify.urlEncodedBodyParser()
+Server.use Restify.throttle {
+  burst: 100,
+  rate: 50,
+  ip: true,
+  #overrides: {
+  #  '192.168.1.1': {
+  #    rate: 0,#unlimited
+  #    burst: 0
+  #  }
+  #}
+}
 Server.use Sanitize.sanitize {
     'groupname': /^[a-zA-Z-_0-9]+$/i
     'mapname': /^[a-zA-Z-_0-9]+$/i
@@ -71,7 +82,6 @@ TODO:
   * return main file
   * return main file on right start page ?
   * config file
-  * throttle
   * version API
   * doc
   * tests
