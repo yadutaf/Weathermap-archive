@@ -24,6 +24,7 @@
 Restify = require 'restify'
 Connect = require 'connect'
 Logger = require 'bunyan'
+Sanitize = require './lib/sanitize'
 Path = require 'path'
 Fs = require 'fs'
 
@@ -58,16 +59,22 @@ Server.use Restify.authorizationParser()
 Server.use Restify.dateParser()
 Server.use Restify.queryParser()
 Server.use Restify.urlEncodedBodyParser()
+Server.use Sanitize.sanitize {
+    'groupname': /^[a-zA-Z-_0-9]+$/i
+    'mapname': /^[a-zA-Z-_0-9]+$/i
+    'date': /^\d\d\d\d-\d\d-\d\d$/i
+  }
 
 ###
 TODO:
   * return bad method for paths under the API dir
-  * faille se sécu => filtrer les ".." dans les urls
   * return main file
   * return main file on right start page ?
   * config file
   * throttle
   * version API
+  * doc
+  * tests
 ###
 
 # Utils
@@ -118,17 +125,17 @@ Server.get '/wm-api/:groupname/:mapname/dates', (req, res, next) ->
       res.send 200, files.directories
     next()
 
-Server.get '/wm-api/:groupname/:mapname/:dates/times', (req, res, next) ->
-  Fs.parsedir weathermapsDir+req.params.groupname+"/"+req.params.mapname+"/"+req.params.dates, (err, files) =>
-    if files.files
+Server.get '/wm-api/:groupname/:mapname/:date/times', (req, res, next) ->
+  Fs.parsedir weathermapsDir+req.params.groupname+"/"+req.params.mapname+"/"+req.params.date, (err, files) =>
+    if files and files.files
       ret = []
       files.files.forEach (file) =>
         return if not file.endsWith ".png"
         ret.push file.slice(0, -4)
       if ret.length
         res.send 200, ret
-        return next() 
-    res.send new Restify.ResourceNotFoundError("No times were found for group "+req.params.groupname+" at date "+req.params.dates)
+        return next()
+    res.send new Restify.ResourceNotFoundError("No times were found for group "+req.params.groupname+" at date "+req.params.date)
     next()
 
 # Application static files
