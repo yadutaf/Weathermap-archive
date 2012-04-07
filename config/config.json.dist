@@ -1,0 +1,30 @@
+/*
+ * *Template* configuration file for WeatherMap Archiver
+ *
+ * DO NOT use it directly but copy it to "config.json"
+ *
+ * This file will be reloaded each time an edition is done
+ * but not all parameters support this feature !
+ */
+
+//Configuration goes here. Please note that comments are allowed :)
+{
+  /* Parameters needing application reload */
+  "staticFilesDir": "../static/"         // application files are here
+ ,"weathermapsDir": "/var/weathermaps/" // archived maps are here
+ ,"port": "3008"                         // port to listen on
+ ,"ip":"0.0.0.0"                         // ip to listen on. May be IPv6
+ ,"throttle": {                            // API survival parameters (limit allowed query rate)
+    "burst": 100
+   ,"rate": 50 
+   ,"ip": true
+    //"overrides": {
+    //  "192.168.1.1": {
+    //    "rate": 0#unlimited
+    //   ,"burst": 0
+    //  }
+    //}  
+  }
+
+  /* Dynamic parameters */
+}
