@@ -105,6 +105,8 @@ TODO:
 
 # Utils
 
+noop = ->
+
 createStaticServer = (objectName, dir, urlbase, urlsuffix='') ->
   urlbase = '/'+urlbase
   urlsuffix = '\.'+urlsuffix+'/' if urlsuffix.length
@@ -112,9 +114,10 @@ createStaticServer = (objectName, dir, urlbase, urlsuffix='') ->
   Server.get urlbase+'/.*'+urlsuffix, (req, res, next) ->
     req.url = req.url.substr urlbase.length  # take off leading /base so that connect locates it correctly
     staticServer req, res, (status) ->
-      #TODO: handle status
-      res.send new Restify.ResourceNotFoundError("Requested "+objectName+" could not be found")
-      next()
+      if status
+        return console.error status.toString() + " for path "+req.url
+      return res.send new Restify.ResourceNotFoundError("Requested "+objectName+" could not be found")
+    return
 
 ###
 API:
@@ -165,9 +168,10 @@ Server.get '/wm-api/:groupname/:mapname/:date/times', (req, res, next) ->
     next()
 
 Server.get '/', (req, res, next) ->
-  res.header 'Location', '/wm/index.html'
-  res.send 301, ""
-#  next(false)
+  res.statusCode = 301
+  res.setHeader 'Location', '/wm/index.html'
+  res.end 'Redirecting to /wm/index.html'
+  return
 
 # Application static files
 createStaticServer "application file", config.staticFilesDir, "wm"
