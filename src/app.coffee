@@ -25,6 +25,7 @@ Restify = require 'restify'
 Connect = require 'connect'
 Logger = require 'bunyan'
 Sanitize = require './lib/sanitize'
+Workarounds = require './lib/workarounds'
 Path = require 'path'
 Fs = require 'fs'
 
@@ -76,7 +77,8 @@ Server = Restify.createServer {
   Logger: log
 }
 
-Server.use Connect.logger()
+Server.use Workarounds.forLogger()
+Server.use Connect.logger('dev')
 Server.use Restify.acceptParser Server.acceptable
 Server.use Restify.authorizationParser()
 Server.use Restify.dateParser()
@@ -98,6 +100,7 @@ TODO:
   * doc
   * tests
   * update static servers on config change
+  * add jsonp support
 ###
 
 # Utils
@@ -160,6 +163,11 @@ Server.get '/wm-api/:groupname/:mapname/:date/times', (req, res, next) ->
         return next()
     res.send new Restify.ResourceNotFoundError("No times were found for group "+req.params.groupname+" at date "+req.params.date)
     next()
+
+Server.get '/', (req, res, next) ->
+  res.header 'Location', '/wm/index.html'
+  res.send 301, ""
+#  next(false)
 
 # Application static files
 createStaticServer "application file", config.staticFilesDir, "wm"
