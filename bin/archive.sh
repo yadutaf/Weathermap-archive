@@ -35,12 +35,8 @@ for archivescripts in `ls ./archive.d`; do
     MAPS=`./archive.d/$archivescripts`
     for map in $MAPS; do
       map=(${map//;/ })
-      echo "create dir: "$BASEDIR"/"${archivescripts%%.*}"/"${map[0]}"/"$DATE
-      echo "download from: "${map[1]}
-      echo "download to: "$BASEDIR"/"${archivescripts%%.*}"/"${map[0]}"/"$DATE"/"$FILENAME
-      echo "-----------------------------------------------------------------"
-      #mkdir -p $BASEDIR"/"${archivescripts%%.*}"/"${map[0]}"/"$DATE
-      #wget -q ${map[1]} -O $BASEDIR"/"${archivescripts%%.*}"/"${map[0]}"/"$DATE"/"$FILENAME
+      mkdir -p $BASEDIR"/"${archivescripts%%.*}"/"${map[0]}"/"$DATE
+      wget -q ${map[1]} -O $BASEDIR"/"${archivescripts%%.*}"/"${map[0]}"/"$DATE"/"$FILENAME
     done
   fi
 done
