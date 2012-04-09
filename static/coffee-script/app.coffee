@@ -101,7 +101,7 @@ Weathermaps.current = Ember.Object.create {
     date = @get('date')
     time = @get('time')
     if group and map and date and time
-      "http://ovh.jtlebi.fr/"+group+"/"+map+"/"+date+"/"+time+".png"
+      baseurl+"/"+group+"/"+map+"/"+date+"/"+time+".png"
      else
       ""
   ).property('group', 'map', 'date', 'time')

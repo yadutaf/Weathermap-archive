@@ -106,7 +106,7 @@ Weathermaps.current = Ember.Object.create({
     date = this.get('date');
     time = this.get('time');
     if (group && map && date && time) {
-      return "http://ovh.jtlebi.fr/" + group + "/" + map + "/" + date + "/" + time + ".png";
+      return baseurl + "/" + group + "/" + map + "/" + date + "/" + time + ".png";
     } else {
       return "";
     }
