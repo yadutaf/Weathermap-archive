@@ -1,6 +1,6 @@
 Weathermaps = Ember.Application.create()
 
-baseurl = "http://test1.jtlebi.fr/wm-api"
+baseurl = "/wm-api"
 
 ###
 Models/Controllers
