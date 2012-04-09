@@ -61,7 +61,7 @@ Weathermaps.dates = Em.ArrayController.create({
         data.sort();
         data.reverse();
         _this.set('options', data);
-        if (data.length > 1) return _this.set('value', data[0]);
+        if (data.length >= 1) return _this.set('value', data[0]);
       });
     }
   }).observes("map")
@@ -88,7 +88,7 @@ Weathermaps.times = Em.ArrayController.create({
         data.sort();
         data.reverse();
         _this.set('options', data);
-        if (data.length > 1) return _this.set('value', data[0]);
+        if (data.length >= 1) return _this.set('value', data[0]);
       });
     }
   }).observes("date")

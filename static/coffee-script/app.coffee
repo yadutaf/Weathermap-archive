@@ -59,7 +59,7 @@ Weathermaps.dates = Em.ArrayController.create {
         data.reverse()
         @set 'options', data
         #auto-select the most recent
-        if data.length > 1
+        if data.length >= 1
           @set 'value', data[0]
   ).observes("map")
 }
@@ -85,7 +85,7 @@ Weathermaps.times = Em.ArrayController.create {
         data.reverse()
         @set 'options', data
         #auto-select the most recent
-        if data.length > 1
+        if data.length >= 1
           @set 'value', data[0]
   ).observes("date")
 }
