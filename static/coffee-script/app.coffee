@@ -107,12 +107,7 @@ Weathermaps.current = Ember.Object.create {
 Views
 ###
 
-Weathermaps.GroupListView = Ember.View.extend {
-  templateName: 'grouplist'
-  active: true #always visible
-  
-  valueBinding: 'Weathermaps.groups.value'
-  optionsBinding: 'Weathermaps.groups.options'
+MainMenuView = Ember.View.extend {
   
   title: (->
     value = @get 'value'
@@ -125,7 +120,16 @@ Weathermaps.GroupListView = Ember.View.extend {
   
 }
 
-Weathermaps.MapListView = Ember.View.extend {
+Weathermaps.GroupListView = MainMenuView.extend {
+  templateName: 'grouplist'
+  active: true #always visible
+  
+  valueBinding: 'Weathermaps.groups.value'
+  optionsBinding: 'Weathermaps.groups.options'
+  
+}
+
+Weathermaps.MapListView = MainMenuView.extend {
   templateName: 'maplist'
   groupBinding: 'Weathermaps.groups.value'
   active: (->
@@ -134,19 +138,10 @@ Weathermaps.MapListView = Ember.View.extend {
   
   valueBinding: 'Weathermaps.maps.value'
   optionsBinding: 'Weathermaps.maps.options'
-  
-  title: (->
-    value = @get 'value'
-    if value then value else 'Map name'
-  ).property('value')
-  
-  select: (e) ->
-    $(e.target).parents('.open').removeClass('open')
-    @set 'value', e.context
-  
+ 
 }
 
-Weathermaps.DateListView = Ember.View.extend {
+Weathermaps.DateListView = MainMenuView.extend {
   templateName: 'datelist'
   groupBinding: 'Weathermaps.groups.value'
   mapBinding:   'Weathermaps.maps.value'
@@ -156,19 +151,10 @@ Weathermaps.DateListView = Ember.View.extend {
   
   valueBinding: 'Weathermaps.dates.value'
   optionsBinding: 'Weathermaps.dates.options'
-  
-  title: (->
-    value = @get 'value'
-    if value then value else 'Date'
-  ).property('value')
-  
-  select: (e) ->
-    $(e.target).parents('.open').removeClass('open')
-    @set 'value', e.context
-  
+ 
 }
 
-Weathermaps.TimeListView = Ember.View.extend {
+Weathermaps.TimeListView = MainMenuView.extend {
   templateName: 'datelist'
   groupBinding: 'Weathermaps.groups.value'
   mapBinding:   'Weathermaps.maps.value'
@@ -179,16 +165,7 @@ Weathermaps.TimeListView = Ember.View.extend {
   
   valueBinding: 'Weathermaps.times.value'
   optionsBinding: 'Weathermaps.times.options'
-  
-  title: (->
-    value = @get 'value'
-    if value then value else 'Time'
-  ).property('value')
-  
-  select: (e) ->
-    $(e.target).parents('.open').removeClass('open')
-    @set 'value', e.context
-  
+
 }
 
 #init
