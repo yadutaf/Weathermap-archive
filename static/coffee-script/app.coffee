@@ -12,7 +12,6 @@ Weathermaps.groups = Em.ArrayController.create {
   
   refresh: (->
     $.getJSON baseurl+"/groups", (data) =>
-      console.log data
       @set 'options', data
       #if we have only one value, auto-select it
       if data.length is 1
@@ -32,7 +31,6 @@ Weathermaps.maps = Em.ArrayController.create {
       @set 'options', []
     else
       $.getJSON baseurl+"/"+group+"/maps", (data) =>
-        console.log data
         @set 'options', data
         #if we have only one value, auto-select it
         if data.length is 1
@@ -54,7 +52,6 @@ Weathermaps.dates = Em.ArrayController.create {
       @set 'options', []
     else
       $.getJSON baseurl+"/"+group+"/"+map+"/dates", (data) =>
-        console.log data
         data.sort()
         data.reverse()
         @set 'options', data
@@ -80,7 +77,6 @@ Weathermaps.times = Em.ArrayController.create {
       @set 'options', []
     else
       $.getJSON baseurl+"/"+group+"/"+map+"/"+date+"/times", (data) =>
-        console.log data
         data.sort()
         data.reverse()
         @set 'options', data
