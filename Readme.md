@@ -43,7 +43,9 @@
     
     $ cd /path/to/code/
     $ npm install -d
-    $ cd src
+    $ cd static/coffee-script
+    $ coffee -bc *.coffee
+    $ cd ../../src
     $ node server.js
 
   Next step :
