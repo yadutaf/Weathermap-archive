@@ -120,52 +120,45 @@ MainMenuView = Ember.View.extend {
   
 }
 
-Weathermaps.GroupListView = MainMenuView.extend {
-  templateName: 'grouplist'
-  active: true #always visible
-  
-  valueBinding: 'Weathermaps.groups.value'
-  optionsBinding: 'Weathermaps.groups.options'
-  
+createMenu = (name) ->
+  menu = MainMenuView.extend {
+    templateName: name+'list'
+    valueBinding: 'Weathermaps.'+name+'s.value'
+    optionsBinding: 'Weathermaps.'+name+'s.options'
+  }
+
+Weathermaps.GroupListView = createMenu('group')
+Weathermaps.MapListView = createMenu('map')
+Weathermaps.DateListView = createMenu('date')
+Weathermaps.TimeListView = createMenu('time')
+
+Weathermaps.GroupListView.reopen {
+  active: true
 }
 
-Weathermaps.MapListView = MainMenuView.extend {
-  templateName: 'maplist'
+Weathermaps.MapListView.reopen { 
   groupBinding: 'Weathermaps.groups.value'
+
   active: (->
     return if @get('group').length then true else false
    ).property 'group'
-  
-  valueBinding: 'Weathermaps.maps.value'
-  optionsBinding: 'Weathermaps.maps.options'
- 
 }
 
-Weathermaps.DateListView = MainMenuView.extend {
-  templateName: 'datelist'
+Weathermaps.DateListView.reopen { 
   groupBinding: 'Weathermaps.groups.value'
   mapBinding:   'Weathermaps.maps.value'
   active: (->
     return if @get('map').length then true else false
    ).property 'map'
-  
-  valueBinding: 'Weathermaps.dates.value'
-  optionsBinding: 'Weathermaps.dates.options'
- 
 }
 
-Weathermaps.TimeListView = MainMenuView.extend {
-  templateName: 'datelist'
+Weathermaps.TimeListView.reopen {
   groupBinding: 'Weathermaps.groups.value'
   mapBinding:   'Weathermaps.maps.value'
   dateBinding:  'Weathermaps.dates.value'
   active: (->
     return if @get('date').length then true else false
    ).property 'date'
-  
-  valueBinding: 'Weathermaps.times.value'
-  optionsBinding: 'Weathermaps.times.options'
-
 }
 
 #init
