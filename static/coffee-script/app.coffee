@@ -124,6 +124,7 @@ Weathermaps.GroupListView = Ember.View.extend {
   ).property 'value'
   
   select: (e) ->
+    $(e.target).parents('.open').removeClass('open')
     @set 'value', e.context
   
 }
@@ -144,6 +145,7 @@ Weathermaps.MapListView = Ember.View.extend {
   ).property('value')
   
   select: (e) ->
+    $(e.target).parents('.open').removeClass('open')
     @set 'value', e.context
   
 }
@@ -165,6 +167,7 @@ Weathermaps.DateListView = Ember.View.extend {
   ).property('value')
   
   select: (e) ->
+    $(e.target).parents('.open').removeClass('open')
     @set 'value', e.context
   
 }
@@ -187,6 +190,7 @@ Weathermaps.TimeListView = Ember.View.extend {
   ).property('value')
   
   select: (e) ->
+    $(e.target).parents('.open').removeClass('open')
     @set 'value', e.context
   
 }
