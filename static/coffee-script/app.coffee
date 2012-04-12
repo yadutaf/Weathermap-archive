@@ -6,10 +6,20 @@ baseurl = "/wm-api"
 Models/Controllers
 ###
 
-Weathermaps.groups = Em.ArrayController.create {
+ListController = Ember.ArrayController.extend {
   value: ''
   options: []
-  
+
+  select: (value) ->
+    if value in options
+      @set 'value', value
+      return true
+    else
+      return false
+
+}
+
+Weathermaps.groups = ListController.create {
   refresh: (->
     $.getJSON baseurl+"/groups", (data) =>
       @set 'options', data
@@ -19,9 +29,7 @@ Weathermaps.groups = Em.ArrayController.create {
   )
 }
 
-Weathermaps.maps = Em.ArrayController.create {
-  value: ''
-  options: []
+Weathermaps.maps = ListController.create {
   groupBinding: 'Weathermaps.groups.value'
   
   refresh: (->
@@ -38,9 +46,7 @@ Weathermaps.maps = Em.ArrayController.create {
   ).observes("group")
 }
 
-Weathermaps.dates = Em.ArrayController.create {
-  value: ''
-  options: []
+Weathermaps.dates = ListController.create {
   groupBinding: 'Weathermaps.groups.value'
   mapBinding:   'Weathermaps.maps.value'
   
@@ -61,9 +67,7 @@ Weathermaps.dates = Em.ArrayController.create {
   ).observes("map")
 }
 
-Weathermaps.times = Em.ArrayController.create {
-  value: ''
-  options: []
+Weathermaps.times = ListController.create {
   groupBinding: 'Weathermaps.groups.value'
   mapBinding:   'Weathermaps.maps.value'
   dateBinding:  'Weathermaps.dates.value'
@@ -107,11 +111,16 @@ Weathermaps.current = Ember.Object.create {
 Views
 ###
 
+# Main view. Nothing special here. Mostly a "hook"
+Weathermaps.main = Ember.View.create {
+  templateName: 'main'
+}
+
 MainMenuView = Ember.View.extend {
-  
+  defaultTitle: 'Dropdown'
   title: (->
     value = @get 'value'
-    if value then value else 'Group name'
+    if value then value else @get 'defaultTitle'
   ).property 'value'
   
   select: (e) ->
@@ -134,19 +143,23 @@ Weathermaps.TimeListView = createMenu('time')
 
 Weathermaps.GroupListView.reopen {
   active: true
+  defaultTitle: 'Group name'
 }
 
-Weathermaps.MapListView.reopen { 
+Weathermaps.MapListView.reopen {
   groupBinding: 'Weathermaps.groups.value'
+  defaultTitle: 'Map name'
 
   active: (->
     return if @get('group').length then true else false
    ).property 'group'
 }
 
-Weathermaps.DateListView.reopen { 
+Weathermaps.DateListView.reopen {
   groupBinding: 'Weathermaps.groups.value'
   mapBinding:   'Weathermaps.maps.value'
+  defaultTitle: 'Date'
+
   active: (->
     return if @get('map').length then true else false
    ).property 'map'
@@ -156,11 +169,38 @@ Weathermaps.TimeListView.reopen {
   groupBinding: 'Weathermaps.groups.value'
   mapBinding:   'Weathermaps.maps.value'
   dateBinding:  'Weathermaps.dates.value'
+  defaultTitle: 'Time'
+
   active: (->
     return if @get('date').length then true else false
    ).property 'date'
 }
 
-#init
-Weathermaps.groups.refresh()
+###
+app router
+###
 
+Weathermaps.routeManager = Ember.RouteManager.create {
+  rootView: Weathermaps.main
+  home: Ember.LayoutState.create {
+    selector: '.home'
+    viewClass: Em.View.extend {
+      templateName: 'home'
+    }
+  }
+  map: Ember.LayoutState.create {
+    route: 'map'
+    selector: '.map'
+    viewClass: Em.View.extend {
+      templateName: 'map'
+    }
+  }
+}
+
+###
+init
+###
+$ ->
+  Weathermaps.groups.refresh()
+  Weathermaps.main.appendTo 'body'
+  Weathermaps.routeManager.start()

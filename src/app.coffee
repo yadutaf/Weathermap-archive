@@ -115,7 +115,8 @@ createStaticServer = (objectName, dir, urlbase, urlsuffix='') ->
     req.url = req.url.substr urlbase.length  # take off leading /base so that connect locates it correctly
     staticServer req, res, (status) ->
       if status
-        return console.error status.toString() + " for path "+req.url
+        if status.errno == 9 #EBADF => weird error to ignore
+          return console.error status.toString() + " for path "+req.url
       return res.send new Restify.ResourceNotFoundError("Requested "+objectName+" could not be found")
     return
 

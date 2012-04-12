@@ -20,7 +20,8 @@
 </head>
 <body>
 <!--[if lt IE 7]><p class=chromeframe>Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</p><![endif]-->
-
+    <!-- Main application template. Menu + payload placeholder  -->
+    <script type="text/x-handlebars" data-template-name="main">
     <nav class="navbar navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container">
@@ -29,9 +30,9 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </a>
-          <a class="brand" href="/">Weathermap archive</a>
+          <a class="brand home" href="#">Weathermap archive</a>
           <!-- TODO: The same code block is repeated 4 times with 4 views. is that possible to factor it ? -->
-          <script type="text/x-handlebars">
+
           {{#view Weathermaps.GroupListView}}
           {{#if active}}
           <ul class="nav">
@@ -39,7 +40,7 @@
               <a data-toggle="dropdown" class="dropdown-toggle" href="#">{{title}} <b class="caret"></b></a>
               <ul class="dropdown-menu">
                 {{#each options}}
-                <li><a href="#" {{action "select"}}>{{this}}</a></li>
+                <li><a href="#map" {{action "select"}}>{{this}}</a></li>
                 {{/each}}
               </ul>
             </li>
@@ -54,7 +55,7 @@
               <a data-toggle="dropdown" class="dropdown-toggle" href="#">{{title}} <b class="caret"></b></a>
               <ul class="dropdown-menu">
                 {{#each options}}
-                <li><a href="#" {{action "select"}}>{{this}}</a></li>
+                <li><a href="#map" {{action "select"}}>{{this}}</a></li>
                 {{/each}}
               </ul>
             </li>
@@ -69,7 +70,7 @@
               <a data-toggle="dropdown" class="dropdown-toggle" href="#">{{title}} <b class="caret"></b></a>
               <ul class="dropdown-menu">
                 {{#each options}}
-                <li><a href="#" {{action "select"}}>{{this}}</a></li>
+                <li><a href="#map" {{action "select"}}>{{this}}</a></li>
                 {{/each}}
               </ul>
             </li>
@@ -84,47 +85,50 @@
               <a data-toggle="dropdown" class="dropdown-toggle" href="#">{{title}} <b class="caret"></b></a>
               <ul class="dropdown-menu">
                 {{#each options}}
-                <li><a href="#" {{action "select"}}>{{this}}</a></li>
+                <li><a href="#map" {{action "select"}}>{{this}}</a></li>
                 {{/each}}
               </ul>
             </li>
           </ul>
           {{/if}}
           {{/view}}
-          </script>
         </div>
       </div>
     </nav>
 
 
     <div class="container">
-      <div id="#map"></div>
-      <script type="text/x-handlebars">
-        {{#if Weathermaps.current.url}}
-        <img {{bindAttr src="Weathermaps.current.url"}}>
-        {{else}}
-        <div class="row">
-          <div class="span4 offset4">
-            <div class="hero-unit">
-              <h2>Weathermap-Archive.<h2>
-              <p>&nbsp;<p>
-              <p>Please pick one :-)<p>
-            </div>
-          </div>
-        </div>
-        {{/if}}
-      </script>
-      
+      {{dynamicView}}
       <hr>
       <footer>
         <p>&copy; jtlebi 2012</p>
       </footer>
-    </div> <!-- /container -->
+    </div> <!-- /container --> 
+    </script>
+
+    <!-- Home template -->
+    <script type="text/x-handlebars" data-template-name="home">
+    <div class="hero-unit">
+      <h1>Weathermap-Archive.</h1>
+      <p>Please, pick one :) </p>
+    </div>
+    </script>
     
+    <script type="text/x-handlebars" data-template-name="map">
+      <div id="#map">
+        {{#if Weathermaps.current.url}}
+        <img {{bindAttr src="Weathermaps.current.url"}}>
+        {{/if}}
+      </div>
+    </script>
+
 <script src="js/libs/jquery-1.7.2.min.js"></script>
 <script src="js/libs/modernizr-2.5.3-respond-1.1.0.min.js"></script>
-<script src="js/libs/ember-0.9.6.min.js"></script>
 <script src="js/libs/bootstrap/bootstrap.min.js"></script>
+<!--<script src="js/libs/ember-0.9.6.min.js"></script>-->
+<script src="js/libs/ember.js"></script>
+<script src="js/libs/ember-layout.js"></script>
+<script src="js/libs/ember-routemanager.js"></script>
 
 <!--TODO: faire le tri ici. Les dépendances ne sont pas claires du tout...-->
 <script src="js/libs/bootstrap/dropdown.js"></script>
