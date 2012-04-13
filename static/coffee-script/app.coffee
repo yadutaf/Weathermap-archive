@@ -7,25 +7,30 @@ Models/Controllers
 ###
 
 ListController = Ember.ArrayController.extend {
+  default: 'single'#may be 'single' or 'first'
   value: ''
   options: []
 
-  select: (value) ->
-    if value in options
-      @set 'value', value
-      return true
+  _autoSelect: (() ->
+    options = @get 'options'
+    #if we have a selected value
+    if @get('value') in options
+      return
+    #if we have only one value in single mode, auto-select it
+    else if options.length is 1 and @get('default') is 'single'
+      @set 'value', options[0]
+    #if we have more than 1 value in 'first' mode, auto-select it
+    else if options.length >= 1 and @get('default') is 'first'
+      @set 'value', options[0]
     else
-      return false
-
+      @set 'value', ''
+  ).observes('options', 'default')
 }
 
 Weathermaps.groups = ListController.create {
-  refresh: (->
+  refresh: ( ->
     $.getJSON baseurl+"/groups", (data) =>
       @set 'options', data
-      #if we have only one value, auto-select it
-      if data.length is 1
-        @set 'value', data[0]
   )
 }
 
@@ -33,25 +38,21 @@ Weathermaps.maps = ListController.create {
   groupBinding: 'Weathermaps.groups.value'
   
   refresh: (->
-    @set 'value', ""#on group change, reset active value
     group = @get 'group'
     if not group
       @set 'options', []
     else
       $.getJSON baseurl+"/"+group+"/maps", (data) =>
         @set 'options', data
-        #if we have only one value, auto-select it
-        if data.length is 1
-          @set 'value', data[0]
   ).observes("group")
 }
 
 Weathermaps.dates = ListController.create {
+  default: 'first'
   groupBinding: 'Weathermaps.groups.value'
   mapBinding:   'Weathermaps.maps.value'
   
   refresh: (->
-    @set 'value', ""#on map change, reset active value
     group = @get 'group'
     map = @get 'map'
     if not map
@@ -61,13 +62,11 @@ Weathermaps.dates = ListController.create {
         data.sort()
         data.reverse()
         @set 'options', data
-        #auto-select the most recent
-        if data.length >= 1
-          @set 'value', data[0]
   ).observes("map")
 }
 
 Weathermaps.times = ListController.create {
+  default: 'first'
   groupBinding: 'Weathermaps.groups.value'
   mapBinding:   'Weathermaps.maps.value'
   dateBinding:  'Weathermaps.dates.value'
@@ -105,6 +104,23 @@ Weathermaps.current = Ember.Object.create {
      else
       ""
   ).property('group', 'map', 'date', 'time')
+  permalink: (->
+    if Weathermaps.routeManager
+      group = @get('group')
+      map = @get('map')
+      date = @get('date')
+      time = @get('time')
+      url = "map"
+      if group
+        url += "/"+group
+        if map
+          url += "/"+map
+          if date
+            url+= "/"+date
+            if time
+              url += "/"+time
+      Weathermaps.routeManager.set 'location', url
+  ).observes('group', 'map', 'date', 'time')
 }
 
 ###
@@ -126,6 +142,7 @@ MainMenuView = Ember.View.extend {
   select: (e) ->
     $(e.target).parents('.open').removeClass('open')
     @set 'value', e.context
+    return false
   
 }
 
@@ -193,6 +210,14 @@ Weathermaps.routeManager = Ember.RouteManager.create {
     selector: '.map'
     viewClass: Em.View.extend {
       templateName: 'map'
+    }
+    group: Ember.LayoutState.create {
+      route: ":group"
+      viewClass: Em.View.extend {}
+      enter: (stateManager, transition) ->
+        @_super stateManager, transition
+        group = stateManager.getPath 'params.group'
+        Weathermaps.current.set 'group', group
     }
   }
 }
