@@ -72,7 +72,6 @@ Weathermaps.times = ListController.create {
   dateBinding:  'Weathermaps.dates.value'
   
   refresh: (->
-    @set 'value', ""#on map change, reset active value
     group = @get 'group'
     map = @get 'map'
     date = @get 'date'
@@ -83,13 +82,11 @@ Weathermaps.times = ListController.create {
         data.sort()
         data.reverse()
         @set 'options', data
-        #auto-select the most recent
-        if data.length >= 1
-          @set 'value', data[0]
   ).observes("date")
 }
 
 Weathermaps.current = Ember.Object.create {
+  lock: true
   groupBinding: "Weathermaps.groups.value"
   mapBinding: "Weathermaps.maps.value"
   dateBinding: "Weathermaps.dates.value"
@@ -105,6 +102,8 @@ Weathermaps.current = Ember.Object.create {
       ""
   ).property('group', 'map', 'date', 'time')
   permalink: (->
+    if @get 'lock'
+      return false
     if Weathermaps.routeManager
       group = @get('group')
       map = @get('map')
@@ -120,6 +119,7 @@ Weathermaps.current = Ember.Object.create {
             if time
               url += "/"+time
       Weathermaps.routeManager.set 'location', url
+      return url
   ).observes('group', 'map', 'date', 'time')
 }
 
@@ -197,6 +197,33 @@ Weathermaps.TimeListView.reopen {
 app router
 ###
 
+createMapChunkRouter = (name, next) ->
+  #if needed, link to next level
+  ChunkRouter = if next
+    Ember.LayoutState.extend {
+      next: next
+      nexts: Ember.LayoutState.create {
+        viewClass: Em.View.extend {}
+        enter: (stateManager, transition) ->
+          @_super stateManager, transition
+          Weathermaps.current.set 'lock', false
+      }
+    }
+  else
+    Ember.LayoutState
+  #create instance
+  ChunkRouter.create {
+    route: ':'+name
+    viewClass: Em.View.extend {}
+    enter: (stateManager, transition) ->
+      @_super stateManager, transition
+      Weathermaps.current.set 'lock', true
+      chunk = stateManager.getPath 'params.'+name
+      Weathermaps.current.set name, chunk
+      if not next
+        Weathermaps.current.set 'lock', false
+  }
+
 Weathermaps.routeManager = Ember.RouteManager.create {
   rootView: Weathermaps.main
   home: Ember.LayoutState.create {
@@ -211,14 +238,11 @@ Weathermaps.routeManager = Ember.RouteManager.create {
     viewClass: Em.View.extend {
       templateName: 'map'
     }
-    group: Ember.LayoutState.create {
-      route: ":group"
-      viewClass: Em.View.extend {}
-      enter: (stateManager, transition) ->
-        @_super stateManager, transition
-        group = stateManager.getPath 'params.group'
-        Weathermaps.current.set 'group', group
-    }
+    #map router
+    router: createMapChunkRouter 'group',#group level
+            createMapChunkRouter 'map',  #map level
+            createMapChunkRouter 'date', #date level
+            createMapChunkRouter 'time'  #time level
   }
 }
 
@@ -229,3 +253,4 @@ $ ->
   Weathermaps.groups.refresh()
   Weathermaps.main.appendTo 'body'
   Weathermaps.routeManager.start()
+  Weathermaps.current.set 'lock', false
