@@ -8,27 +8,59 @@ Models/Controllers
 
 ListController = Ember.ArrayController.extend {
   default: 'single'#may be 'single' or 'first'
-  value: ''
-  options: []
+  value: ''        #active value. *MUST* be valid (ie: in options array)
+  candidate: ''    #a value we will try to apply asa it becomes valid, if ever
+  options: []      #list of valid options
+  
+  wish: (value) ->
+    if value in @get 'options'
+      @set 'value', value
+      @set 'candidate', ''
+    else
+      @set 'value', ''
+      @set 'candidate', value
+  
+  refresh: ->
+    value = @get 'value'
+    if value
+      @set 'candidate', value
+      @set 'value', ''
+    @set 'options', []
 
   _autoSelect: (() ->
     options = @get 'options'
+    value = @get 'value'
+    def = @get 'default'
+    #if we have no options
+    if options.length is 0
+      if value.length
+        @set 'candidate', value
+        @set 'value', ''
+      return
     #if we have a selected value
-    if @get('value') in options
+    if value in options
+      return
+    if value.length is 0 and @get('candidate') in options
+      @set 'value', @get 'candidate'
+      @set 'candidate', ""
       return
     #if we have only one value in single mode, auto-select it
-    else if options.length is 1 and @get('default') is 'single'
+    if options.length is 1 and def is 'single'
       @set 'value', options[0]
+      @set 'candidate', ""
     #if we have more than 1 value in 'first' mode, auto-select it
-    else if options.length >= 1 and @get('default') is 'first'
+    else if options.length >= 1 and def is 'first'
       @set 'value', options[0]
-    else
+      @set 'candidate', ''
+    else#keep value in candidate until a manual selection is operated
+      @set 'candidate', value
       @set 'value', ''
   ).observes('options', 'default')
 }
 
 Weathermaps.groups = ListController.create {
   refresh: ( ->
+    @_super()
     $.getJSON baseurl+"/groups", (data) =>
       @set 'options', data
   )
@@ -38,6 +70,7 @@ Weathermaps.maps = ListController.create {
   groupBinding: 'Weathermaps.groups.value'
   
   refresh: (->
+    @_super()
     group = @get 'group'
     if not group
       @set 'options', []
@@ -49,10 +82,12 @@ Weathermaps.maps = ListController.create {
 
 Weathermaps.dates = ListController.create {
   default: 'first'
+  default: 'first'
   groupBinding: 'Weathermaps.groups.value'
   mapBinding:   'Weathermaps.maps.value'
   
   refresh: (->
+    @_super()
     group = @get 'group'
     map = @get 'map'
     if not map
@@ -72,6 +107,7 @@ Weathermaps.times = ListController.create {
   dateBinding:  'Weathermaps.dates.value'
   
   refresh: (->
+    @_super()
     group = @get 'group'
     map = @get 'map'
     date = @get 'date'
@@ -86,29 +122,30 @@ Weathermaps.times = ListController.create {
 }
 
 Weathermaps.current = Ember.Object.create {
-  lock: true
   groupBinding: "Weathermaps.groups.value"
   mapBinding: "Weathermaps.maps.value"
   dateBinding: "Weathermaps.dates.value"
   timeBinding: "Weathermaps.times.value"
   url: (->
-    group = @get('group')
-    map = @get('map')
-    date = @get('date')
-    time = @get('time')
+    group = @get 'group'
+    map   = @get 'map'
+    date  = @get 'date'
+    time  = @get 'time'
     if group and map and date and time
       baseurl+"/"+group+"/"+map+"/"+date+"/"+time+".png"
      else
       ""
   ).property('group', 'map', 'date', 'time')
-  permalink: (->
-    if @get 'lock'
-      return false
-    if Weathermaps.routeManager
-      group = @get('group')
-      map = @get('map')
-      date = @get('date')
-      time = @get('time')
+  _permalinkTimer: null
+  _permalink: ->
+    @_permalinkTimer = null
+    if Weathermaps.routeManager.get('location') is null
+      null #avoid first call
+    else
+      group = @get 'group'
+      map   = @get 'map'
+      date  = @get 'date'
+      time  = @get 'time'
       url = "map"
       if group
         url += "/"+group
@@ -119,7 +156,15 @@ Weathermaps.current = Ember.Object.create {
             if time
               url += "/"+time
       Weathermaps.routeManager.set 'location', url
-      return url
+      url
+
+  #urls are both input and output vectors. This timeout
+  #helps preventing url flickering. Better ideas are welcome !
+  permalink: (->
+    if @_permalinkTimer
+      clearTimeout @_permalinkTimer
+      @_permalinkTimer = null
+    @_permalinkTimer = setTimeout (=> @_permalink()), 300
   ).observes('group', 'map', 'date', 'time')
 }
 
@@ -204,9 +249,6 @@ createMapChunkRouter = (name, next) ->
       next: next
       nexts: Ember.LayoutState.create {
         viewClass: Em.View.extend {}
-        enter: (stateManager, transition) ->
-          @_super stateManager, transition
-          Weathermaps.current.set 'lock', false
       }
     }
   else
@@ -217,11 +259,8 @@ createMapChunkRouter = (name, next) ->
     viewClass: Em.View.extend {}
     enter: (stateManager, transition) ->
       @_super stateManager, transition
-      Weathermaps.current.set 'lock', true
       chunk = stateManager.getPath 'params.'+name
-      Weathermaps.current.set name, chunk
-      if not next
-        Weathermaps.current.set 'lock', false
+      Weathermaps[name+'s'].wish chunk
   }
 
 Weathermaps.routeManager = Ember.RouteManager.create {
@@ -254,3 +293,4 @@ $ ->
   Weathermaps.main.appendTo 'body'
   Weathermaps.routeManager.start()
   Weathermaps.current.set 'lock', false
+
