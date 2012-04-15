@@ -58,68 +58,57 @@ ListController = Ember.ArrayController.extend {
   ).observes('options', 'default')
 }
 
-Weathermaps.groups = ListController.create {
-  refresh: ( ->
-    @_super()
-    $.getJSON baseurl+"/groups", (data) =>
+createListController = (name, parentName, init) ->
+  if 'Object' is typeof parentName
+    init = parentName
+  init = init || {}
+
+  controller = if parentName
+    ListController.extend {
+      parentValueBinding: 'Weathermaps.'+parentName+'s.value'
+      parentUrlBinding: 'Weathermaps.'+parentName+'s.databaseurl'
+      databaseurl: (->
+        @get('parentUrl')+"/"+@get('parentValue')
+      ).property('parentValue', 'parentUrl')
+
+      refresh: ((cb)->
+        @_super()
+        url = @get('databaseurl')
+        parentValue = @get 'parentValue'
+        if parentValue
+          $.getJSON url+"/"+name+"s", cb
+      )
+    }
+  else
+    ListController.extend {
+      databaseurl: baseurl
+      refresh: ( ->
+        @_super()
+        $.getJSON @get('databaseurl')+"/"+name+"s", (data) =>
+          @set 'options', data
+      )
+    }
+  controller.create(init)
+
+dateTime =  {
+  default: 'first'
+  refresh: (->
+    @_super (data) =>
+      data.sort()
+      data.reverse()
       @set 'options', data
-  )
+  ).observes 'parentValue'
 }
 
-Weathermaps.maps = ListController.create {
-  groupBinding: 'Weathermaps.groups.value'
-  
+Weathermaps.groups = createListController "group"
+Weathermaps.maps = createListController "map", "group", {
   refresh: (->
-    @_super()
-    group = @get 'group'
-    if not group
-      @set 'options', []
-    else
-      $.getJSON baseurl+"/"+group+"/maps", (data) =>
-        @set 'options', data
-  ).observes("group")
+    @_super (data) =>
+       @set 'options', data
+  ).observes 'parentValue'
 }
-
-Weathermaps.dates = ListController.create {
-  default: 'first'
-  default: 'first'
-  groupBinding: 'Weathermaps.groups.value'
-  mapBinding:   'Weathermaps.maps.value'
-  
-  refresh: (->
-    @_super()
-    group = @get 'group'
-    map = @get 'map'
-    if not map
-      @set 'options', []
-    else
-      $.getJSON baseurl+"/"+group+"/"+map+"/dates", (data) =>
-        data.sort()
-        data.reverse()
-        @set 'options', data
-  ).observes("map")
-}
-
-Weathermaps.times = ListController.create {
-  default: 'first'
-  groupBinding: 'Weathermaps.groups.value'
-  mapBinding:   'Weathermaps.maps.value'
-  dateBinding:  'Weathermaps.dates.value'
-  
-  refresh: (->
-    @_super()
-    group = @get 'group'
-    map = @get 'map'
-    date = @get 'date'
-    if not date
-      @set 'options', []
-    else
-      $.getJSON baseurl+"/"+group+"/"+map+"/"+date+"/times", (data) =>
-        data.sort()
-        data.reverse()
-        @set 'options', data
-  ).observes("date")
-}
+Weathermaps.dates = createListController "date", "map", dateTime
+Weathermaps.times = createListController "time", "date", dateTime
 
 Weathermaps.current = Ember.Object.create {
   groupBinding: "Weathermaps.groups.value"
