@@ -281,5 +281,4 @@ $ ->
   Weathermaps.groups.refresh()
   Weathermaps.main.appendTo 'body'
   Weathermaps.routeManager.start()
-  Weathermaps.current.set 'lock', false
 
