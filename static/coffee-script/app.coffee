@@ -278,6 +278,7 @@ Weathermaps.routeManager = Ember.RouteManager.create {
 init
 ###
 $ ->
+  $.ajaxSetup { headers: {'accept-version': "~0.1"}}
   Weathermaps.groups.refresh()
   Weathermaps.main.appendTo 'body'
   Weathermaps.routeManager.start()

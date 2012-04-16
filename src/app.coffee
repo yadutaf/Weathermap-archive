@@ -29,6 +29,8 @@ Workarounds = require './lib/workarounds'
 Path = require 'path'
 Fs = require 'fs'
 
+package = JSON.parse Fs.readFileSync __dirname+'/../package.json'
+
 require './lib/parsedir'
 require './lib/utils'
 
@@ -73,8 +75,9 @@ log = new Logger {
 }
 
 Server = Restify.createServer {
-  name: "WeatherMap viewer",
+  name: "WeatherMap viewer"
   Logger: log
+  version: package.version
 }
 
 Server.use Workarounds.forLogger()
@@ -130,7 +133,9 @@ API:
   * GET /wm/ => static app files
 ###
 
-Server.get '/wm-api/groups', (req, res, next) ->
+V0_1 = {}
+
+V0_1.getGroups = (req, res, next) ->
   Fs.parsedir config.weathermapsDir, (err, files) =>
     if not files.directories
       res.send new Restify.ResourceNotFoundError("No groups were found")
@@ -138,8 +143,7 @@ Server.get '/wm-api/groups', (req, res, next) ->
       res.send 200, files.directories
     next()
 
-
-Server.get '/wm-api/:groupname/maps', (req, res, next) ->
+V0_1.getMaps = (req, res, next) ->
   Fs.parsedir config.weathermapsDir+"/"+req.params.groupname, (err, files) =>
     if not files or not files.directories
       res.send new Restify.ResourceNotFoundError("No maps were found for group "+req.params.groupname)
@@ -147,7 +151,7 @@ Server.get '/wm-api/:groupname/maps', (req, res, next) ->
       res.send 200, files.directories
     next()
 
-Server.get '/wm-api/:groupname/:mapname/dates', (req, res, next) ->
+V0_1.getDates = (req, res, next) ->
   Fs.parsedir config.weathermapsDir+"/"+req.params.groupname+"/"+req.params.mapname, (err, files) =>
     if not files or not files.directories
       res.send new Restify.ResourceNotFoundError("No dates were found for group "+req.params.groupname)
@@ -155,7 +159,7 @@ Server.get '/wm-api/:groupname/:mapname/dates', (req, res, next) ->
       res.send 200, files.directories
     next()
 
-Server.get '/wm-api/:groupname/:mapname/:date/times', (req, res, next) ->
+V0_1.getTimes = (req, res, next) ->
   Fs.parsedir config.weathermapsDir+"/"+req.params.groupname+"/"+req.params.mapname+"/"+req.params.date, (err, files) =>
     if files and files.files
       ret = []
@@ -168,11 +172,18 @@ Server.get '/wm-api/:groupname/:mapname/:date/times', (req, res, next) ->
     res.send new Restify.ResourceNotFoundError("No times were found for group "+req.params.groupname+" at date "+req.params.date)
     next()
 
-Server.get '/', (req, res, next) ->
+V0_1.getDefault = (req, res, next) ->
   res.statusCode = 301
   res.setHeader 'Location', '/wm/index.html'
   res.end 'Redirecting to /wm/index.html'
   return
+
+Server.get {path: '/', version: '0.1.0a.0'}, V0_1.getDefault
+Server.get {path: '/wm-api/groups', version: '0.1.0a.0'}, V0_1.getGroups
+Server.get {path: '/wm-api/:groupname/maps', version: '0.1.0a.0'}, V0_1.getMaps
+Server.get {path: '/wm-api/:groupname/:mapname/dates', version: '0.1.0a.0'}, V0_1.getDates
+Server.get {path: '/wm-api/:groupname/:mapname/:date/times', version: '0.1.0a.0'}, V0_1.getTimes
+
 
 # Application static files
 createStaticServer "application file", config.staticFilesDir, "wm"
