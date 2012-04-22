@@ -74,6 +74,37 @@
   * GET /wm-api/:groupname/:mapname/:date/times => get a list of archived time for this date
   * GET /wm-api/:groupname/:mapname/:date/:time.png => get a given map
   * GET /wm/ => static app files (Not really an API)
+
+### API reqest format
+  
+  All API are GET only. Any parameter that would be appended afer a question mark
+  are ignored. All valid parameters are included in the route. You may customize
+  route chunks starting with a colon. 
+
+### API answers format
+  
+  Groups, maps and dates API return a valid JSON array containing the complete list
+  of valid values in the current context. Result should not be cached for too long
+  as they may change very often.
+  
+  Times API will return a hashmap of the form
+  
+  
+  ``` js
+  {
+    TIME: 
+    {
+      type: TYPE
+      field1:...
+      field2:...
+      ...
+      fieldn:...
+    }
+  }
+  ```
+  
+  Where TIME is of the form '..h..'. The only mandatory field is the TYPE fieled
+  which indicates which render to use.
  
 ## Dependancies
 

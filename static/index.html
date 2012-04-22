@@ -69,12 +69,9 @@
     </div>
     </script>
     
+    <!-- render placeholder -->
     <script type="text/x-handlebars" data-template-name="map">
-      <div id="#map">
-        {{#if Weathermaps.current.selected.url}}
-        <img {{bindAttr src="Weathermaps.current.selected.url"}}>
-        {{/if}}
-      </div>
+      <div id="map-render"></div>
     </script>
 
 <script src="js/libs/jquery-1.7.2.min.js"></script>
@@ -102,6 +99,7 @@
 
 
 <script src="coffee-script/app.js"></script>
+<script src="coffee-script/render.js"></script>
 
 <script src="js/script.js"></script>
 
