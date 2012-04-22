@@ -31,71 +31,10 @@
             <span class="icon-bar"></span>
           </a>
           <a class="brand home" href="#">Weathermap archive</a>
-          <!-- TODO: The same code block is repeated 4 times with 4 views. is that possible to factor it ? -->
-
-          {{#view Weathermaps.GroupListView}}
-          {{#if active}}
-          <ul class="nav">
-            <li class="dropdown">
-              <a data-toggle="dropdown" class="dropdown-toggle" href="#">{{title}} <b class="caret"></b></a>
-              <ul class="dropdown-menu">
-                {{#each options}}
-                <li><a href="#" {{action "select"}}>{{this}}</a></li>
-                {{/each}}
-              </ul>
-            </li>
-          </ul>
-          {{/if}}
-          {{/view}}
-          
-          {{#view Weathermaps.MapListView}}
-          {{#if active}}
-          <ul class="nav">
-            <li class="dropdown">
-              <a data-toggle="dropdown" class="dropdown-toggle" href="#">{{title}} <b class="caret"></b></a>
-              <ul class="dropdown-menu">
-                {{#each options}}
-                <li><a href="#" {{action "select"}}>{{this}}</a></li>
-                {{/each}}
-              </ul>
-            </li>
-          </ul>
-          {{/if}}
-          {{/view}}
-          
-          {{#view Weathermaps.DateListView}}
-          {{#if active}}
-          <ul class="nav">
-            <li class="dropdown">
-              <a data-toggle="dropdown" class="dropdown-toggle" href="#">{{title}} <b class="caret"></b></a>
-              <ul class="dropdown-menu">
-                {{#each options}}
-                <li><a href="#" {{action "select"}}>{{this}}</a></li>
-                {{/each}}
-              </ul>
-            </li>
-          </ul>
-          {{/if}}
-          {{/view}}
-          
-          {{#view Weathermaps.TimeListView}}
-          {{#if active}}
-          <ul class="nav">
-            <li class="dropdown">
-              <a data-toggle="dropdown" class="dropdown-toggle" href="#">{{title}} <b class="caret"></b></a>
-              <ul class="dropdown-menu">
-                {{#each options}}
-                <li><a href="#" {{action "select"}}>{{this}}</a></li>
-                {{/each}}
-              </ul>
-            </li>
-          </ul>
-          {{/if}}
-          {{/view}}
+          <div id="list-menu"></div>
         </div>
       </div>
     </nav>
-
 
     <div class="container">
       {{dynamicView}}
@@ -104,6 +43,22 @@
         <p>&copy; jtlebi 2012</p>
       </footer>
     </div> <!-- /container --> 
+    </script>
+    
+    <!-- Menu list template -->
+    <script type="text/x-handlebars" data-template-name="menu-list">
+    {{#if active}}
+    <ul class="nav">
+      <li class="dropdown">
+        <a data-toggle="dropdown" class="dropdown-toggle" href="#">{{title}} <b class="caret"></b></a>
+        <ul class="dropdown-menu">
+          {{#each options}}
+          <li><a href="#" {{action "select"}}>{{this}}</a></li>
+          {{/each}}
+        </ul>
+      </li>
+    </ul>
+    {{/if}}
     </script>
 
     <!-- Home template -->

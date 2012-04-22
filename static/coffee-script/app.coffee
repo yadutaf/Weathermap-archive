@@ -168,6 +168,8 @@ Weathermaps.main = Ember.View.create {
 
 MainMenuView = Ember.View.extend {
   defaultTitle: 'Dropdown'
+  templateName: 'menu-list'
+  active: false
   title: (->
     value = @get 'value'
     if value then value else @get 'defaultTitle'
@@ -180,51 +182,41 @@ MainMenuView = Ember.View.extend {
   
 }
 
-createMenu = (name) ->
+createMenu = (name, activeRule, ext) ->
   menu = MainMenuView.extend {
-    templateName: name+'list'
     valueBinding: 'Weathermaps.'+name+'s.value'
     optionsBinding: 'Weathermaps.'+name+'s.options'
   }
+  
+  if activeRule == true
+    ext.active = true
+  else if activeRule.length
+    ext.active = (->
+      return if @get(activeRule).length then true else false
+    ).property activeRule
+  
+  menu.create ext
 
-Weathermaps.GroupListView = createMenu('group')
-Weathermaps.MapListView = createMenu('map')
-Weathermaps.DateListView = createMenu('date')
-Weathermaps.TimeListView = createMenu('time')
-
-Weathermaps.GroupListView.reopen {
-  active: true
+Weathermaps.GroupListView = createMenu 'group', true, {
   defaultTitle: 'Group name'
 }
 
-Weathermaps.MapListView.reopen {
+Weathermaps.MapListView = createMenu 'map', 'group', {
   groupBinding: 'Weathermaps.groups.value'
   defaultTitle: 'Map name'
-
-  active: (->
-    return if @get('group').length then true else false
-   ).property 'group'
 }
 
-Weathermaps.DateListView.reopen {
+Weathermaps.DateListView = createMenu 'date', 'map', {
   groupBinding: 'Weathermaps.groups.value'
   mapBinding:   'Weathermaps.maps.value'
   defaultTitle: 'Date'
-
-  active: (->
-    return if @get('map').length then true else false
-   ).property 'map'
 }
 
-Weathermaps.TimeListView.reopen {
+Weathermaps.TimeListView = createMenu 'time', 'date', {
   groupBinding: 'Weathermaps.groups.value'
   mapBinding:   'Weathermaps.maps.value'
   dateBinding:  'Weathermaps.dates.value'
   defaultTitle: 'Time'
-
-  active: (->
-    return if @get('date').length then true else false
-   ).property 'date'
 }
 
 ###
@@ -278,8 +270,16 @@ Weathermaps.routeManager = Ember.RouteManager.create {
 init
 ###
 $ ->
+  #application re-start
   $.ajaxSetup { headers: {'accept-version': "~0.1"}}
   Weathermaps.groups.refresh()
+  
+  #load views
   Weathermaps.main.appendTo 'body'
+  Weathermaps.GroupListView.appendTo '#list-menu'
+  Weathermaps.MapListView.appendTo '#list-menu'
+  Weathermaps.DateListView.appendTo '#list-menu'
+  Weathermaps.TimeListView.appendTo '#list-menu'
+  
+  #application launch
   Weathermaps.routeManager.start()
-
