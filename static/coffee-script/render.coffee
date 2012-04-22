@@ -33,6 +33,7 @@ Renders are expected to :
 
 Weathermaps.render = Ember.Object.create {
   selectedBinding: 'Weathermaps.times.selected'
+  currentStateBinding: 'Weathermaps.routeManager.currentState'
   renderEngines: []
   currentType: ''
   views: {}
@@ -40,8 +41,25 @@ Weathermaps.render = Ember.Object.create {
   registerTemplate: (name, source, cb) ->
     Ember.TEMPLATES['map-render-'+name] = Ember.Handlebars.compile(source)
     cb() if cb
-
-  render: (->
+  
+  #re-inits the render on route switches to get the image back (was detached from DOM)
+  initRender: (->
+    state = @get 'currentState'
+    current = @get 'currentType'
+    
+    return if not current.length
+    
+    while state
+      if state.name and state.name == "map"
+        if current.length
+          Weathermaps.render.views[current].appendTo '#map-render'
+        return
+      else
+        state = state.parentState
+    Weathermaps.render.views[current].remove()
+  ).observes 'currentState'
+  
+  refreshRender: (->
     selected = @get 'selected'
     prevType = @get 'currentType'
     
@@ -62,6 +80,7 @@ Weathermaps.render = Ember.Object.create {
       $.getScript 'coffee-script/render/'+selected.type+'.js', ->
         Weathermaps.render.views[selected.type].appendTo '#map-render'
     else
-      Weathermaps.render.views[selected.type].appendTo '#map-render'      
+      Weathermaps.render.views[selected.type].appendTo '#map-render'
+    return ""
   ).observes 'selected'
 }

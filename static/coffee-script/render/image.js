@@ -26,7 +26,7 @@ name = 'image';
 
 source = '\
   {{#if Weathermaps.current.selected.url}}\
-  <img {{bindAttr src="Weathermaps.current.selected.url"}}>\
+  <img {{bindAttr src="Weathermaps.render.selected.url"}}>\
   {{/if}}';
 
 Weathermaps.render.views[name] = Em.View.create({
