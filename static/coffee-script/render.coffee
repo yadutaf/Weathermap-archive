@@ -52,11 +52,11 @@ Weathermaps.render = Ember.Object.create {
     while state
       if state.name and state.name == "map"
         if current.length
+          Weathermaps.render.views[current].remove()
           Weathermaps.render.views[current].appendTo '#map-render'
         return
       else
         state = state.parentState
-    Weathermaps.render.views[current].remove()
   ).observes 'currentState'
   
   refreshRender: (->
