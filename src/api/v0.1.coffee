@@ -26,13 +26,14 @@ API:
   * GET /wm-api/group => get a list a groups for which we have archives
   * GET /wm-api/:groupname/maps => get a list of available maps for this group
   * GET /wm-api/:groupname/:mapname/dates => get list of archived days
-  * GET /wm-api/:groupname/:mapname/:date/times
-  * GET /wm-api/*.png => get a given map
+  * GET /wm-api/:groupname/:mapname/:date/times => get list of archived times + their meta informations
+  * GET /wm-api/*.png => get a given static PNG map
   * GET /wm/ => static app files
 ###
 
+Restify = require 'restify'
 Fs = require 'fs'
-version = '0.1.0a.0'
+version = '0.1.0a.1'
 
 module.exports = (Server, config) ->
   createStaticServer = require('../lib/staticServer') Server
@@ -66,11 +67,15 @@ module.exports = (Server, config) ->
     getTimes: (req, res, next) ->
       Fs.parsedir config.weathermapsDir+"/"+req.params.groupname+"/"+req.params.mapname+"/"+req.params.date, (err, files) =>
         if files and files.files
-          ret = []
+          ret = {}
           files.files.forEach (file) =>
             return if not file.endsWith ".png"
-            ret.push file.slice(0, -4)
-          if ret.length
+            time = file.slice 0, -4
+            ret[time] = {
+              type: 'image'
+              url: "/wm-api/"+req.params.groupname+"/"+req.params.mapname+"/"+req.params.date+"/"+time+".png"
+            }
+          if ret != {}
             res.send 200, ret
             return next()
         res.send new Restify.ResourceNotFoundError("No times were found for group "+req.params.groupname+" at date "+req.params.date)

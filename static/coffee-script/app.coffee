@@ -3,6 +3,13 @@ Weathermaps = Ember.Application.create()
 baseurl = "/wm-api"
 
 ###
+Utils
+###
+
+keys = (obj) ->
+  key for key, value of obj
+
+###
 Models/Controllers
 ###
 
@@ -90,7 +97,14 @@ createListController = (name, parentName, init) ->
     }
   controller.create(init)
 
-dateTime =  {
+Weathermaps.groups = createListController "group"
+Weathermaps.maps = createListController "map", "group", {
+  refresh: (->
+    @_super (data) =>
+       @set 'options', data
+  ).observes 'parentValue'
+}
+Weathermaps.dates = createListController "date", "map", {
   default: 'first'
   refresh: (->
     @_super (data) =>
@@ -99,32 +113,36 @@ dateTime =  {
       @set 'options', data
   ).observes 'parentValue'
 }
-
-Weathermaps.groups = createListController "group"
-Weathermaps.maps = createListController "map", "group", {
+Weathermaps.times = createListController "time", "date", {
+  default: 'first'
+  cache: {}
+  selected: (->
+    @get('cache')[@get 'value']
+  ).property 'value'
   refresh: (->
     @_super (data) =>
-       @set 'options', data
+      k = keys data
+      k.sort()
+      k.reverse()
+      @set 'options', k
+      @set 'cache', data
   ).observes 'parentValue'
 }
-Weathermaps.dates = createListController "date", "map", dateTime
-Weathermaps.times = createListController "time", "date", dateTime
 
 Weathermaps.current = Ember.Object.create {
   groupBinding: "Weathermaps.groups.value"
   mapBinding: "Weathermaps.maps.value"
   dateBinding: "Weathermaps.dates.value"
   timeBinding: "Weathermaps.times.value"
+  selectedBinding: "Weathermaps.times.selected"
   url: (->
-    group = @get 'group'
-    map   = @get 'map'
-    date  = @get 'date'
-    time  = @get 'time'
-    if group and map and date and time
-      baseurl+"/"+group+"/"+map+"/"+date+"/"+time+".png"
+    selected = @get 'selected'
+    console.log selected
+    if selected and selected.type == "image"
+      selected.url
      else
       ""
-  ).property('group', 'map', 'date', 'time')
+  ).property 'selected'
   _permalinkTimer: null
   _permalink: ->
     @_permalinkTimer = null
