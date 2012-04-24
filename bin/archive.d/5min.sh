@@ -27,9 +27,18 @@
 BASEDIR="/home/weathermaps"
 
 ## Nothing to be modified past this point ##
-#eval each script in archive.d dir
-for archivescripts in `ls ./archive.d`; do
-  if [[ (-x "./archive.d/$archivescripts") && (-f "./archive.d/$archivescripts") ]]; then
-    ./archive.d/$archivescripts
+DATE=`date +%Y-%m-%d`
+FILENAME=`date +%Hh%M`".png"
+
+cd archive.d
+
+for archivescripts in `ls ./5min.d`; do
+  if [ -x "./5min.d/$archivescripts" ]; then
+    MAPS=`./5min.d/$archivescripts`
+    for map in $MAPS; do
+      map=(${map//;/ })
+      mkdir -p $BASEDIR"/"${archivescripts%%.*}"/"${map[0]}"/"$DATE
+      wget -q ${map[1]} -O $BASEDIR"/"${archivescripts%%.*}"/"${map[0]}"/"$DATE"/"$FILENAME
+    done
   fi
 done
