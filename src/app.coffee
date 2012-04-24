@@ -90,7 +90,8 @@ Server.use Restify.throttle config.throttle
 Server.use Sanitize.sanitize {
     'groupname': /^[a-zA-Z-_0-9]+$/i
     'mapname': /^[a-zA-Z-_0-9]+$/i
-    'date': /^\d\d\d\d-\d\d-\d\d$/i
+    'date': /^[a-zA-Z-_0-9]+$/i
+#    'date': /^\d\d\d\d-\d\d-\d\d$/i
   }
 
 ###
