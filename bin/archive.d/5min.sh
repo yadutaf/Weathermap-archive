@@ -23,10 +23,8 @@
 # USE OR OTHER DEALINGS IN THE SOFTWARE.
 ###
 
-## Script configuration goes here ##
-BASEDIR="/home/weathermaps"
-
 ## Nothing to be modified past this point ##
+BASEDIR=$1
 DATE=`date +%Y-%m-%d`
 FILENAME=`date +%Hh%M`".png"
 

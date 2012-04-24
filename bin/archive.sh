@@ -30,6 +30,6 @@ BASEDIR="/home/weathermaps"
 #eval each script in archive.d dir
 for archivescripts in `ls ./archive.d`; do
   if [[ (-x "./archive.d/$archivescripts") && (-f "./archive.d/$archivescripts") ]]; then
-    ./archive.d/$archivescripts
+    ./archive.d/$archivescripts "$BASEDIR"
   fi
 done
