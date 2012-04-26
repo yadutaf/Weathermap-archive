@@ -42,6 +42,8 @@ ListController = Ember.ArrayController.extend {
   candidate: ''    #a value we will try to apply asa it becomes valid, if ever
   options: []      #list of valid options
   
+  _timeout: null   #auto-update timer
+  
   wish: (value) ->
     if value in @get 'options'
       @set 'value', value
@@ -50,12 +52,18 @@ ListController = Ember.ArrayController.extend {
       @set 'value', ''
       @set 'candidate', value
   
-  load: ->
-    #value = @get 'value'
-    #if value
-    #  @set 'candidate', value
-    #  @set 'value', ''
-    #@set 'options', []
+  load: (parentChanged)->
+    #clear auto-update timer
+    clearTimeout @_timeout if @_timeout
+    @_timeout = null
+    
+    #reset data befor update
+    value = @get 'value'
+    if value
+      @set 'candidate', value
+    if parentChanged
+      @set 'value', ''
+      @set 'options', []
 
   _autoSelect: (() ->
     options = @get 'options'
@@ -101,8 +109,8 @@ createListController = (name, parentName, init) ->
         @get('parentUrl')+"/"+@get('parentValue')
       ).property('parentValue', 'parentUrl')
 
-      load: ((cb)->
-        @_super()
+      load: ((parentChanged, cb)->
+        @_super(parentChanged)
         parentValue = @get 'parentValue'
         if parentValue
           $.getJSON @get('databaseurl')+"/"+name+"s", cb
@@ -111,29 +119,37 @@ createListController = (name, parentName, init) ->
   else
     ListController.extend {
       databaseurl: baseurl
-      load: ( ->
-        @_super()
+      load: ((parentChanged) ->
+        @_super(parentChanged)
         $.getJSON @get('databaseurl')+"/"+name+"s", (data) =>
-          @set 'options', data
+          if not data.compareArrays(@get 'options')
+            @set 'options', data
+        _load: (-> @load true).observes 'parentValue'
       )
     }
   controller.create(init)
 
 Weathermaps.groups = createListController "group"
 Weathermaps.maps = createListController "map", "group", {
-  load: (->
-    @_super (data) =>
-       @set 'options', data
-  ).observes 'parentValue'
+  load: ((parentChanged)->
+    @_super true, (data) =>
+      if not data.compareArrays(@get 'options')
+        @set 'options', data
+        @_timeout = setTimeout (=> @load(false)), 60*60*1000#1 hour
+  )
+  _load: (-> @load true).observes 'parentValue'
 }
 Weathermaps.dates = createListController "date", "map", {
   default: 'first'
-  load: (->
-    @_super (data) =>
+  load: ((parentChanged)->
+    @_super true, (data) =>
       data.sort()
       data.reverse()
-      @set 'options', data
-  ).observes 'parentValue'
+      if not data.compareArrays(@get 'options')
+        @set 'options', data
+        @_timeout = setTimeout (=> @load(false)), 10*60*1000#10 min
+  )
+  _load: (-> @load true).observes 'parentValue'
 }
 Weathermaps.times = createListController "time", "date", {
   default: 'first'
@@ -141,19 +157,17 @@ Weathermaps.times = createListController "time", "date", {
   selected: (->
     @get('cache')[@get 'value']
   ).property 'value'
-  _timeout: null
-  load: (->
-    clearTimeout @_timeout if @_timeout
-    @_timeout = null
-    
-    @_super (data) =>
+  load: ((parentChanged)->  
+    @_super parentChanged, (data) =>
       k = keys data
       k.sort()
       k.reverse()
-      @set 'options', k
-      @set 'cache', data
-      @_timeout = setTimeout (=> @load()), 60*1000#1 min
-  ).observes 'parentValue'
+      if not k.compareArrays(@get 'options')
+        @set 'options', k
+        @set 'cache', data
+      @_timeout = setTimeout (=> @load(false)), 60*1000#1 min
+  )
+  _load: (-> @load true).observes 'parentValue'
 }
 
 Weathermaps.current = Ember.Object.create {
