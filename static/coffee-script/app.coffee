@@ -124,8 +124,9 @@ createListController = (name, parentName, init) ->
         $.getJSON @get('databaseurl')+"/"+name+"s", (data) =>
           if not data.compareArrays(@get 'options')
             @set 'options', data
-        _load: (-> @load true).observes 'parentValue'
+          @_timeout = setTimeout (=> @load(false)), 60*60*1000#1 hour
       )
+      _load: (-> @load true).observes 'parentValue'
     }
   controller.create(init)
 
@@ -135,7 +136,7 @@ Weathermaps.maps = createListController "map", "group", {
     @_super true, (data) =>
       if not data.compareArrays(@get 'options')
         @set 'options', data
-        @_timeout = setTimeout (=> @load(false)), 60*60*1000#1 hour
+      @_timeout = setTimeout (=> @load(false)), 60*60*1000#1 hour
   )
   _load: (-> @load true).observes 'parentValue'
 }
@@ -147,7 +148,7 @@ Weathermaps.dates = createListController "date", "map", {
       data.reverse()
       if not data.compareArrays(@get 'options')
         @set 'options', data
-        @_timeout = setTimeout (=> @load(false)), 10*60*1000#10 min
+      @_timeout = setTimeout (=> @load(false)), 10*60*1000#10 min
   )
   _load: (-> @load true).observes 'parentValue'
 }
