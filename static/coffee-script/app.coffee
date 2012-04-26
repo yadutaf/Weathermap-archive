@@ -50,12 +50,12 @@ ListController = Ember.ArrayController.extend {
       @set 'value', ''
       @set 'candidate', value
   
-  refresh: ->
-    value = @get 'value'
-    if value
-      @set 'candidate', value
-      @set 'value', ''
-    @set 'options', []
+  load: ->
+    #value = @get 'value'
+    #if value
+    #  @set 'candidate', value
+    #  @set 'value', ''
+    #@set 'options', []
 
   _autoSelect: (() ->
     options = @get 'options'
@@ -101,18 +101,17 @@ createListController = (name, parentName, init) ->
         @get('parentUrl')+"/"+@get('parentValue')
       ).property('parentValue', 'parentUrl')
 
-      refresh: ((cb)->
+      load: ((cb)->
         @_super()
-        url = @get('databaseurl')
         parentValue = @get 'parentValue'
         if parentValue
-          $.getJSON url+"/"+name+"s", cb
+          $.getJSON @get('databaseurl')+"/"+name+"s", cb
       )
     }
   else
     ListController.extend {
       databaseurl: baseurl
-      refresh: ( ->
+      load: ( ->
         @_super()
         $.getJSON @get('databaseurl')+"/"+name+"s", (data) =>
           @set 'options', data
@@ -122,14 +121,14 @@ createListController = (name, parentName, init) ->
 
 Weathermaps.groups = createListController "group"
 Weathermaps.maps = createListController "map", "group", {
-  refresh: (->
+  load: (->
     @_super (data) =>
        @set 'options', data
   ).observes 'parentValue'
 }
 Weathermaps.dates = createListController "date", "map", {
   default: 'first'
-  refresh: (->
+  load: (->
     @_super (data) =>
       data.sort()
       data.reverse()
@@ -142,13 +141,18 @@ Weathermaps.times = createListController "time", "date", {
   selected: (->
     @get('cache')[@get 'value']
   ).property 'value'
-  refresh: (->
+  _timeout: null
+  load: (->
+    clearTimeout @_timeout if @_timeout
+    @_timeout = null
+    
     @_super (data) =>
       k = keys data
       k.sort()
       k.reverse()
       @set 'options', k
       @set 'cache', data
+      @_timeout = setTimeout (=> @load()), 60*1000#1 min
   ).observes 'parentValue'
 }
 
@@ -305,7 +309,7 @@ init
 $ ->
   #application re-start
   $.ajaxSetup { headers: {'accept-version': "~0.1"}}
-  Weathermaps.groups.refresh()
+  Weathermaps.groups.load()
   
   #load views
   Weathermaps.main.appendTo 'body'
