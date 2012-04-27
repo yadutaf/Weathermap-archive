@@ -33,7 +33,7 @@ API:
 
 Restify = require 'restify'
 Fs = require 'fs'
-version = '0.1.0a.1'
+version = '0.1.0b.1'
 
 module.exports = (Server, config) ->
   createStaticServer = require('../lib/staticServer') Server

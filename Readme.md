@@ -56,6 +56,8 @@
 ## Features
 
  * Periodically archive weathermaps via a cron script
+ * Intuitively navigate among archived images
+ * Automatically updates displayed image to always be up to date
  * Provide an easy API
  * Provide a simple and intutive interface to navigate the archived weathermaps
  * 2 level of categorizations
