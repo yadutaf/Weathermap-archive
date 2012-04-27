@@ -319,7 +319,11 @@ Weathermaps.Player = Ember.View.extend {
       @loop()
   
   loop: ->
-    @timer = setTimeout (=>@loop()), 10*1000#10 sec
+    @moveNext()
+    if @get 'isLast'
+      @timer = setTimeout (=>@loop()), 60*1000#1min
+    else
+      @timer = setTimeout (=>@loop()), 1*1000#1 sec
   
   moveNextDate: ->
     return if @get 'isLast'
@@ -333,6 +337,7 @@ Weathermaps.Player = Ember.View.extend {
     if i
       Weathermaps.times.wish @get('times')[i-1]
     else
+      Weathermaps.times.wish @get('times').last()#FIXME
       @moveNextDate()
   
   movePrevDate: ->
@@ -347,6 +352,7 @@ Weathermaps.Player = Ember.View.extend {
     if i < @get('times').length-1
       Weathermaps.times.wish @get('times')[i+1]
     else
+      Weathermaps.times.wish @get('times')[0]#FIXME
       @movePrevDate()
   
   #status
