@@ -435,7 +435,7 @@ init
 ###
 $ ->
   #application re-start
-  $.ajaxSetup { headers: {'accept-version': "~0.1"}}
+  $.ajaxSetup { headers: {'accept-version': "~0.2"}}
   Weathermaps.groups.load()
   
   #load views

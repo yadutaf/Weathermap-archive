@@ -106,6 +106,7 @@ TODO:
 # API
 
 V0_1 = require('./api/v0.1') Server, config
+V0_1 = require('./api/v0.2') Server, config
 
 Server.listen config.port, config.ip, () ->
   log.info 'listening: %s', Server.url
