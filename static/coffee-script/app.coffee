@@ -320,10 +320,7 @@ Weathermaps.Player = Ember.View.extend {
   
   loop: ->
     @moveNext()
-    if @get 'isLast'
-      @timer = setTimeout (=>@loop()), 60*1000#1min
-    else
-      @timer = setTimeout (=>@loop()), 1*1000#1 sec
+    @timer = setTimeout (=>@loop()), 1*1000#1 sec
   
   moveNextDate: ->
     return if @get 'isLast'
