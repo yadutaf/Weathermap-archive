@@ -31,20 +31,27 @@
           </a>
           <a class="brand home" href="#">Weathermap archive</a>
           <div id="list-menu"></div>
-          <div class="btn-group pull-right">
-            <a class="btn">
+          {{#view Weathermaps.Player}}
+          {{#if date}}
+          <div class="btn-group pull-left">
+            <a {{bindAttr class="disablePrevDate btn"}} {{action "movePrevDate"}}>
+              <i class="icon-fast-backward"></i>
+            </a>
+            <a {{bindAttr class="disablePrev btn"}} {{action "movePrev"}}>
               <i class="icon-step-backward"></i>
             </a>
-            <a class="btn">
-              <i class="icon-pause"></i>
+            <a {{bindAttr class="disablePlayPause btn"}} {{action "playPause"}}>
+              <i {{bindAttr class="statusButtonClass"}}></i>
             </a>
-            <a class="btn">
-              <i class="icon-play"></i>
-            </a>
-            <a class="btn">
+            <a {{bindAttr class="disableNext btn"}} {{action "moveNext"}}>
               <i class="icon-step-forward"></i>
             </a>
+            <a {{bindAttr class="disableNextDate btn"}} {{action "moveNextDate"}}>
+              <i class="icon-fast-forward"></i>
+            </a>
           </div>
+          {{/if}}
+          {{/view}}
         </div>
       </div>
     </nav>
@@ -116,8 +123,8 @@
 <script src="coffee-script/render.js"></script>
 
 <script src="js/script.js"></script>
-
+<!--
 <a href="http://github.com/jtlebi/Weathermap-archive"><img style="position: absolute; top: 0; right: 0; border: 0; z-index: 3000;" src="https://a248.e.akamai.net/assets.github.com/img/7afbc8b248c68eb468279e8c17986ad46549fb71/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub"></a>
-
+-->
 </body>
 </html>

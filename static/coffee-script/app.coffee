@@ -32,6 +32,9 @@ Utils
 keys = (obj) ->
   key for key, value of obj
 
+Array.prototype.last = ->
+  @[@length-1]
+
 ###
 Models/Controllers
 ###
@@ -269,6 +272,109 @@ Weathermaps.TimeListView = createMenu 'time', 'date', {
   mapBinding:   'Weathermaps.maps.value'
   dateBinding:  'Weathermaps.dates.value'
   defaultTitle: 'Time'
+}
+
+# Player
+Weathermaps.Player = Ember.View.extend {
+  templateName: 'player'
+  timeBinding: 'Weathermaps.times.value'
+  dateBinding: 'Weathermaps.dates.value'
+  timesBinding: 'Weathermaps.times.options'
+  datesBinding: 'Weathermaps.dates.options'
+  
+  btn: 'btn'
+  
+  status: 'pause'
+  statusButtonClass: (-> 
+    'icon-'+ if @get('status') is 'pause' then 'play' else 'pause' 
+  ).property 'status'
+  
+  isLastDate: (->
+    if @get('dates')[0] is @get('date') then true else false
+  ).property 'date', 'dates'
+  
+  isLast: (->
+    if @get('isLastDate') and @get('times')[0] is @get('time') then true else false
+  ).property 'time', 'date', 'times', 'dates'
+    
+  isFirstDate: (->
+    if @get('dates').last() is @get('date') then true else false
+  ).property 'date', 'dates'
+  
+  isFirst: (->
+    if @get('isFirstDate') and  @get('times').last() is @get('time') then true else false
+  ).property 'time', 'date', 'times', 'dates'
+  
+  timer: null
+  
+  #Actions
+  playPause: ->
+    if 'play' is @get 'status'
+      if @timer
+        clearTimeout @timer
+        @timer=null
+      @set 'status', 'pause'
+    else
+      @set 'status', 'play'
+      @loop()
+  
+  loop: ->
+    @timer = setTimeout (=>@loop()), 10*1000#10 sec
+  
+  moveNextDate: ->
+    return if @get 'isLast'
+    j = @get('dates').indexOf @get 'date'
+    if j
+      Weathermaps.dates.wish @get('dates')[j-1]
+  
+  moveNext: ->
+    return if @get 'isLast'
+    i = @get('times').indexOf @get 'time'
+    if i
+      Weathermaps.times.wish @get('times')[i-1]
+    else
+      @moveNextDate()
+  
+  movePrevDate: ->
+    return if @get 'isFirst'
+    j = @get('dates').indexOf @get 'date'
+    if j < @get('dates').length-1
+      Weathermaps.dates.wish @get('dates')[j+1]
+  
+  movePrev: ->
+    return if @get 'isFirst'
+    i = @get('times').indexOf @get 'time'
+    if i < @get('times').length-1
+      Weathermaps.times.wish @get('times')[i+1]
+    else
+      @movePrevDate()
+  
+  #status
+  disablePrevDate: (->
+    if not @get('date') or @get('isFirstDate')
+      return 'disabled'
+  ).property 'date', 'isFirstDate'
+  
+  disablePrev: (->
+    if not @get('time') or @get('isFirst')
+      return 'disabled'
+  ).property 'time', 'isFirst'
+  
+  disablePlayPause: (->
+    if not @get('time')
+      return 'disabled'
+  ).property 'time'
+  
+  disableNext: (->
+    if not @get('time') or @get('isLast')
+      return 'disabled'
+  ).property 'time', 'isFirst' 
+  
+  disableNextDate: (->
+    if not @get('date') or @get('isLastDate')
+      return 'disabled'
+  ).property 'date', 'isFirstDate' 
+
 }
 
 ###
