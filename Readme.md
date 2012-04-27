@@ -61,19 +61,19 @@
  * Provide an easy API
  * Provide a simple and intutive interface to navigate the archived weathermaps
  * 2 level of categorizations
- ** top level group (organizations, units)
- ** map name
+   * top level group (organizations, units)
+   * map name
 
 ## Roadmap/History
 
  * version 0.2 => "Let's REST a little, tidy it"
- ** [WIP] migrate file structure to a database
- ** [WIP] module/file separation of client side app.coffee
- ** [TODO] build script (compile less and coffee files)
- ** [WISH] support multiple storage backend on the server side
+   * [WIP] migrate file structure to a database
+   * [WIP] module/file separation of client side app.coffee
+   * [TODO] build script (compile less and coffee files)
+   * [WISH] support multiple storage backend on the server side
  * version 0.1 => "Where the trip begins"
- ** [DONE] basic Read-Only API
- ** [DONE] intuitive bare-bones ember.js interface
+   * [DONE] basic Read-Only API
+   * [DONE] intuitive bare-bones ember.js interface
 
 ## API
 
