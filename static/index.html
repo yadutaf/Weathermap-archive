@@ -31,27 +31,6 @@
           </a>
           <a class="brand home" href="#">Weathermap archive</a>
           <div id="list-menu"></div>
-          {{#view Weathermaps.Player}}
-          {{#if date}}
-          <div class="btn-group pull-left">
-            <a {{bindAttr class="disablePrevDate btn"}} {{action "movePrevDate"}}>
-              <i class="icon-fast-backward"></i>
-            </a>
-            <a {{bindAttr class="disablePrev btn"}} {{action "movePrev"}}>
-              <i class="icon-step-backward"></i>
-            </a>
-            <a {{bindAttr class="disablePlayPause btn"}} {{action "playPause"}}>
-              <i {{bindAttr class="statusButtonClass"}}></i>
-            </a>
-            <a {{bindAttr class="disableNext btn"}} {{action "moveNext"}}>
-              <i class="icon-step-forward"></i>
-            </a>
-            <a {{bindAttr class="disableNextDate btn"}} {{action "moveNextDate"}}>
-              <i class="icon-fast-forward"></i>
-            </a>
-          </div>
-          {{/if}}
-          {{/view}}
         </div>
       </div>
     </nav>
@@ -119,8 +98,14 @@
 
 <script src="js/libs/prototypes.js"></script>
 
+<!-- Application code -->
 <script src="coffee-script/app.js"></script>
+
+<!-- Application plugins -->
+<script src="coffee-script/plugins.js"></script>
+<script src="coffee-script/plugins/router.js"></script>
 <script src="coffee-script/render.js"></script>
+<script src="coffee-script/plugins/player.js"></script>
 
 <script src="js/script.js"></script>
 

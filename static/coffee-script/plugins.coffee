@@ -1,4 +1,4 @@
-/*
+###
 # Copyright jtlebi.fr <admin@jtlebi.fr> and other contributors.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
@@ -19,18 +19,14 @@
 # DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 # USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
-var name, source;
+###
 
-name = 'image';
+###
+Plugins API
+###
 
-source = '\
-  {{#if Weathermaps.current.selected.url}}\
-  <img {{bindAttr src="Weathermaps.render.selected.url"}}>\
-  {{/if}}';
+api = {}
+WM.api = api
 
-Weathermaps.render.views[name] = Em.View.create({
-  templateName: 'map-render-' + name
-});
-
-Weathermaps.render.registerTemplate(name, source);
+api.registerTemplate = (name, source) ->
+  Em.TEMPLATES[name] = Em.Handlebars.compile(source)

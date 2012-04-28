@@ -25,22 +25,21 @@
 Renders are expected to :
 * be of View type
 * be stored in js file './render/name.js'
-* be namespaced as 'Weathermaps.render.name'
+* be namespaced as 'WM.render.name'
 * register there source handlebar code via "registerTemplate"
 * having a templateName of the form "map-render-name"
-* handle themeselves their updates. Ember provides enough tools !
+* handle themeselves their updates. Em provides enough tools !
 ###
 
-Weathermaps.render = Ember.Object.create {
-  selectedBinding: 'Weathermaps.times.selected'
-  currentStateBinding: 'Weathermaps.routeManager.currentState'
+WM.render = Em.Object.create {
+  selectedBinding: 'WM.times.selected'
+  currentStateBinding: 'WM.routeManager.currentState'
   renderEngines: []
   currentType: ''
   views: {}
   
-  registerTemplate: (name, source, cb) ->
-    Ember.TEMPLATES['map-render-'+name] = Ember.Handlebars.compile(source)
-    cb() if cb
+  registerTemplate: (name, source) ->
+    WM.api.registerTemplate 'map-render-'+name, source
   
   #re-inits the render on route switches to get the image back (was detached from DOM)
   initRender: (->
@@ -52,8 +51,8 @@ Weathermaps.render = Ember.Object.create {
     while state
       if state.name and state.name == "map"
         if current.length
-          Weathermaps.render.views[current].remove()
-          Weathermaps.render.views[current].appendTo '#map-render'
+          WM.render.views[current].remove()
+          WM.render.views[current].appendTo '#map-render'
         return
       else
         state = state.parentState
@@ -68,8 +67,8 @@ Weathermaps.render = Ember.Object.create {
       return
       
     #if type changed -> unload render engine and load the new one
-    if Weathermaps.render.views[prevType]
-      Weathermaps.render.views[prevType].remove()
+    if WM.render.views[prevType]
+      WM.render.views[prevType].remove()
     @set 'currentType', selected.type
     
     #if we do not know yet the render engine, load it
@@ -78,9 +77,9 @@ Weathermaps.render = Ember.Object.create {
       engines.push selected.type
       @set 'renderEngines', engines
       $.getScript 'coffee-script/render/'+selected.type+'.js', ->
-        Weathermaps.render.views[selected.type].appendTo '#map-render'
+        WM.render.views[selected.type].appendTo '#map-render'
     else
-      Weathermaps.render.views[selected.type].appendTo '#map-render'
+      WM.render.views[selected.type].appendTo '#map-render'
     return ""
   ).observes 'selected'
 }

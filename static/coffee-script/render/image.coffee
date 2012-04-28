@@ -24,14 +24,14 @@
 # Plugin parameters
 name = 'image'
 source = '
-  {{#if Weathermaps.current.selected.url}}
-  <img {{bindAttr src="Weathermaps.render.selected.url"}}>
+  {{#if WM.render.selected.url}}
+  <img {{bindAttr src="WM.render.selected.url"}}>
   {{/if}}'
 
 # Plugin View definition
-Weathermaps.render.views[name] = Em.View.create {
+WM.render.views[name] = Em.View.create {
   templateName: 'map-render-'+name
 }
 
 # Plugin load
-Weathermaps.render.registerTemplate name, source
+WM.render.registerTemplate name, source
