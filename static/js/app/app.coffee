@@ -20,10 +20,11 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 # USE OR OTHER DEALINGS IN THE SOFTWARE.
 ###
-
+#todo: binding monodirectionels
 WM = Em.Application.create()
 
 baseurl = "/wm-api"
+basedir = "/wm/js/app"
 
 ###
 Utils

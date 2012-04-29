@@ -17,6 +17,7 @@
   * Archiving engine
   * Web Interface / REST API
   
+
   Get the code 
     
     git clone https://github.com/jtlebi/Weathermap-archive.git
@@ -43,7 +44,7 @@
     
     $ cd /path/to/code/
     $ npm install -d
-    $ cd static/coffee-script
+    $ cd static/js
     $ coffee -bc *.coffee
     $ cd ../../src
     $ node server.js
@@ -67,9 +68,10 @@
 ## Roadmap/History
 
  * version 0.2 => "Let's REST a little, tidy it"
+   * [DONE] module/file separation of client side app.coffee
    * [WIP] migrate file structure to a database
-   * [WIP] module/file separation of client side app.coffee
-   * [TODO] build script (compile less and coffee files)
+   * [WIP] build script (compile less and coffee files)
+   * [TODO] plugin loader
    * [WISH] support multiple storage backend on the server side
  * version 0.1 => "Where the trip begins"
    * [DONE] basic Read-Only API
@@ -118,6 +120,59 @@
   
   Where TIME is of the form '..h..'. The only mandatory field is the TYPE fieled
   which indicates which render to use.
+
+## Contribute
+
+  Starting with the 0.2 branch, the application is clearly separated into modules
+  stored in 'static/js/app' folder. Modules can belong in either of 2 categories :
+  
+  * core => main application file needed to actually see something (plugin api, render api, router)
+  * plugins => optional modules (actual renderer, player, <YOUR PLUGIN HERE>, ...)
+  
+
+### Module struccture
+
+  Each module starts with the copyright block followed by a depency line. This
+  line helps to build the import in the index.html file.
+  
+  From the module, you can freely access (bind) anything from the modules you depend on.
+  Please note that the whole application is namespaced under 'WM' and Ember should be used
+  from 'Em'.
+  
+  If your module require a template to be dynamically injected in the application
+  we provide a simple helper "WM.api.registerTemplate(templateName, templateSource)"
+  
+  /!\ Please note that *All* variable in you module are globale. It is *your* responsability to namespace them /!\
+
+### MyPlugin example
+  
+  ``` coffee
+  #depends on: core 
+  
+  ###
+  myPlugin Template
+  ###
+  
+  myPluginTemplateSource = '<p>My plugin version is {{version}}</p>'
+  myPluginTemplateName   = "MyPlugin"
+  
+  ###
+  myPlugin View
+  ###
+  
+  WM.MyPluginView = Em.View.create {
+    templateName: myPluginTemplateName
+    #...
+  }
+  
+  ###
+  myPlugin Init
+  ###
+  
+  $ -> 
+    WM.api.registerTemplate myPluginTemplateName, myPluginTemplateSource
+    WM.Player.appendTo '#selector' #append template
+  ```
  
 ## Dependancies
 

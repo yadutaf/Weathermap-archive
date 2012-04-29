@@ -21,6 +21,8 @@
 # USE OR OTHER DEALINGS IN THE SOFTWARE.
 ###
 
+#depends on: core; router
+
 ###
 Renders are expected to :
 * be of View type
@@ -76,7 +78,7 @@ WM.render = Em.Object.create {
     if selected.type not in @get 'renderEngines'
       engines.push selected.type
       @set 'renderEngines', engines
-      $.getScript 'coffee-script/render/'+selected.type+'.js', ->
+      $.getScript basedir+'/plugins/render/'+selected.type+'.js', ->
         WM.render.views[selected.type].appendTo '#map-render'
     else
       WM.render.views[selected.type].appendTo '#map-render'
