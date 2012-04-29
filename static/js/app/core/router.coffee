@@ -75,11 +75,11 @@ Permalink controller
 ###
 
 WM.permalink = Em.Object.create {
-  groupBinding: "WM.groups.value"
-  mapBinding: "WM.maps.value"
-  dateBinding: "WM.dates.value"
-  timeBinding: "WM.times.value"
-  selectedBinding: "WM.times.selected"
+  groupBinding: Em.Binding.oneWay "WM.groups.value"
+  mapBinding: Em.Binding.oneWay "WM.maps.value"
+  dateBinding: Em.Binding.oneWay "WM.dates.value"
+  timeBinding: Em.Binding.oneWay "WM.times.value"
+  selectedBinding: Em.Binding.oneWay "WM.times.selected"
   _permalinkTimer: null
   _permalink: ->
     @_permalinkTimer = null

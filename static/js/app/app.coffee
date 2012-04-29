@@ -20,7 +20,7 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 # USE OR OTHER DEALINGS IN THE SOFTWARE.
 ###
-#todo: binding monodirectionels
+
 WM = Em.Application.create()
 
 baseurl = "/wm-api"
@@ -107,8 +107,8 @@ createListController = (name, parentName, init) ->
 
   controller = if parentName
     ListController.extend {
-      parentValueBinding: 'WM.'+parentName+'s.value'
-      parentUrlBinding: 'WM.'+parentName+'s.databaseurl'
+      parentValueBinding: Em.Binding.oneWay 'WM.'+parentName+'s.value'
+      parentUrlBinding: Em.Binding.oneWay 'WM.'+parentName+'s.databaseurl'
       databaseurl: (->
         @get('parentUrl')+"/"+@get('parentValue')
       ).property('parentValue', 'parentUrl')
@@ -204,7 +204,7 @@ MainMenuView = Em.View.extend {
 createMenu = (name, activeRule, ext) ->
   menu = MainMenuView.extend {
     valueBinding: 'WM.'+name+'s.value'
-    optionsBinding: 'WM.'+name+'s.options'
+    optionsBinding: Em.Binding.oneWay 'WM.'+name+'s.options'
   }
   
   if activeRule == true
@@ -221,20 +221,20 @@ WM.GroupListView = createMenu 'group', true, {
 }
 
 WM.MapListView = createMenu 'map', 'group', {
-  groupBinding: 'WM.groups.value'
+  groupBinding: Em.Binding.oneWay 'WM.groups.value'
   defaultTitle: 'Map name'
 }
 
 WM.DateListView = createMenu 'date', 'map', {
-  groupBinding: 'WM.groups.value'
-  mapBinding:   'WM.maps.value'
+  groupBinding: Em.Binding.oneWay 'WM.groups.value'
+  mapBinding:   Em.Binding.oneWay 'WM.maps.value'
   defaultTitle: 'Date'
 }
 
 WM.TimeListView = createMenu 'time', 'date', {
-  groupBinding: 'WM.groups.value'
-  mapBinding:   'WM.maps.value'
-  dateBinding:  'WM.dates.value'
+  groupBinding: Em.Binding.oneWay 'WM.groups.value'
+  mapBinding:   Em.Binding.oneWay 'WM.maps.value'
+  dateBinding:  Em.Binding.oneWay 'WM.dates.value'
   defaultTitle: 'Time'
 }
 

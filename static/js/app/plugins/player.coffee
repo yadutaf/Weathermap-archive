@@ -55,10 +55,10 @@ Player View
 
 WM.Player = Em.View.create {
   templateName: playerTemplateName
-  timeBinding: 'WM.times.value'
-  dateBinding: 'WM.dates.value'
-  timesBinding: 'WM.times.options'
-  datesBinding: 'WM.dates.options'
+  timeBinding: Em.Binding.oneWay 'WM.times.value'
+  dateBinding: Em.Binding.oneWay 'WM.dates.value'
+  timesBinding: Em.Binding.oneWay 'WM.times.options'
+  datesBinding: Em.Binding.oneWay 'WM.dates.options'
   
   btn: 'btn'
   

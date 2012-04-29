@@ -34,8 +34,8 @@ Renders are expected to :
 ###
 
 WM.render = Em.Object.create {
-  selectedBinding: 'WM.times.selected'
-  currentStateBinding: 'WM.routeManager.currentState'
+  selectedBinding: Em.Binding.oneWay 'WM.times.selected'
+  currentStateBinding: Em.Binding.oneWay 'WM.routeManager.currentState'
   renderEngines: []
   currentType: ''
   views: {}
