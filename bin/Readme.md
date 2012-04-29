@@ -21,7 +21,10 @@ To disable a script just remove the execute permission on it:
 
 ## Roll you own backup
 
-You may add custom rules to this folder. Main script expects an output
+### Weathermap updated every 5 mins
+
+Most weathermaps are updated every 5 mins. This is why we provide an helper structure
+for this case. You may add a custom rule the 5min.d/ subfolder. Main script expects an output
 of the form :
 
 ```
@@ -29,3 +32,10 @@ mapname;http://domain.tld/path/to/weathermap.png
 ```
 
 The script basename (without the extension), will be used as the Groupname.
+
+### General cases
+
+If you map requires a special action like authentication, you are welcome
+to create a custom script in archive.d folder. The target folder basepath 
+will be provided as "$1". As soon as your ascript gets the 'x' bit, it will be
+launched by the main script. See 5min.sh for an example.
