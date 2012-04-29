@@ -43,16 +43,13 @@
   Install dependancies and Run it (tm) !
     
     $ cd /path/to/code/
-    $ npm install -d
-    $ cd static/js
-    $ coffee -bc *.coffee
-    $ cd ../../src
-    $ node server.js
+    $ bin/run.sh
 
   Next step :
     
     * create a dedicated unpriviledged user
-    * make a start script
+    * hook git pull to "bin/build.sh" to always be up to date
+    * create a "watch script" for auto update in dev mode
 
 ## Features
 
@@ -73,6 +70,7 @@
    * [WIP] build script (compile less and coffee files)
    * [TODO] plugin loader
    * [WISH] support multiple storage backend on the server side
+   * [WISH] menu update push to reduce load
  * version 0.1 => "Where the trip begins"
    * [DONE] basic Read-Only API
    * [DONE] intuitive bare-bones ember.js interface
